@@ -1,36 +1,55 @@
+package com.mycompany.vrsystem;
+
+import javax.swing.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class LogInClass {
+public class SignUpClass {
+    private String username;
+    private String password;
+    private String Name;
+    private String address;
+    private String contactNumber;
+    private String licenseNumber;
 
-    public static void main(String[] args) {
-        // Database connection parameters
-        String url = "jdbc:mysql://localhost:3306/vehiclerentalsystem?useSSL=false&serverTimezone=UTC&autoReconnect=true";
-        String username = "admin"; //MySQL username for admin only
-        String password = "admin123"; // MySQL password for admin only
-
-        try {
-            // Load MySQL JDBC Driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            // Establish connection
-            Connection conn = DriverManager.getConnection(url, username, password);
-            System.out.println("Connection successful!");
-
-            // Test query to ensure the connection is fully established
-            if (conn != null && !conn.isClosed()) {
-                System.out.println("Database connected successfully!");
-                // Close the connection
-                conn.close();
-            }
-
-        } catch (SQLException e) {
-            System.err.println("SQL Error: Unable to connect to database. Check your connection details.");
-            e.printStackTrace(); 
-        } catch (ClassNotFoundException e) {
-            System.err.println("Driver Error: MySQL JDBC Driver not found.");
-            e.printStackTrace(); 
-        }
+    // Constructor to initialize values
+    public SignUpClass(String username, String password, String Name, String address, String contactNumber, String licenseNumber) {
+        this.username = username;
+        this.password = password;
+        this.Name = Name;
+        this.address = address;
+        this.contactNumber = contactNumber;
+        this.licenseNumber = licenseNumber;
     }
+
+    public boolean registerCustomer() {
+        String query = "INSERT INTO users  ( username, password, Name, address, contact_number, license_number) VALUES ( ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = VrSystem.conn(); PreparedStatement pst = conn.prepareStatement(query)) {
+            pst.setString(1, username);
+            pst.setString(2, password);
+            pst.setString(3, Name);
+            pst.setString(4, address);
+            pst.setString(5, contactNumber);
+            pst.setString(6, licenseNumber);
+
+            int rowsInserted = pst.executeUpdate();
+            if (rowsInserted > 0) {
+                JOptionPane.showMessageDialog(null, "Registration successful!");
+            return true;
+            } else {
+                JOptionPane.showMessageDialog(null, "Registration failed. Please try again.");
+             return false;
+            }
+        }catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error during registration: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    } 
 }
+
+
+
 
