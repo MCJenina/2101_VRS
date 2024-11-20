@@ -1,10 +1,21 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ */
+package vrs;
 
-package view;
-import controller.*;
 /**
  *
  * @author jenina
  */
-public class VehicleRent {
-    DBConnection db = new DBConnection();
+public class VRS {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+       LogIn log = new LogIn();
+       log.setVisible(true);
+    }
+    
 }
