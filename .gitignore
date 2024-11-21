@@ -1,0 +1,10 @@
+# Ignore compiled files
+*.class
+*.o
+*.so
+
+# Ignore node_modules
+node_modules/
+
+# Ignore log files
+*.log
