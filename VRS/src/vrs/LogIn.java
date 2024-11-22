@@ -263,8 +263,9 @@ public class LogIn extends javax.swing.JFrame {
                         // Set the session for the logged-in customer
                         SessionManager.setCustomerId(customerId);
 
-                        Booking booking = new Booking();
-                        booking.setVisible(true);
+                        CustomerDashboard cd = new CustomerDashboard();
+                        cd.setVisible(true);
+                        
                         this.dispose();
                     } else {
                         JOptionPane.showMessageDialog(null, "Unknown role: " + role);
