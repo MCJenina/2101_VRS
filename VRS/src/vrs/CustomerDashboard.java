@@ -4,6 +4,8 @@
  */
 package vrs;
 
+import vrs.LogIn;
+
 /**
  *
  * @author jenina
@@ -28,6 +30,7 @@ public class CustomerDashboard extends javax.swing.JFrame {
 
         Book = new javax.swing.JButton();
         Return = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -40,6 +43,13 @@ public class CustomerDashboard extends javax.swing.JFrame {
 
         Return.setText("Return Now!");
 
+        jButton1.setText("Log Out");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -48,7 +58,8 @@ public class CustomerDashboard extends javax.swing.JFrame {
                 .addGap(66, 66, 66)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(Book, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(Return, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(Return, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(325, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -58,7 +69,9 @@ public class CustomerDashboard extends javax.swing.JFrame {
                 .addComponent(Book)
                 .addGap(27, 27, 27)
                 .addComponent(Return)
-                .addContainerGap(110, Short.MAX_VALUE))
+                .addGap(30, 30, 30)
+                .addComponent(jButton1)
+                .addContainerGap(57, Short.MAX_VALUE))
         );
 
         pack();
@@ -66,10 +79,18 @@ public class CustomerDashboard extends javax.swing.JFrame {
 
     private void BookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BookActionPerformed
         // TODO add your handling code here:
-        FillUpForm fill = new FillUpForm();
+        Vehicles fill = new Vehicles();
         fill.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_BookActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+            LogIn loginForm = new LogIn(); // Your login form
+                loginForm.setVisible(true);
+                dispose();  
+            
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -109,5 +130,6 @@ public class CustomerDashboard extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Book;
     private javax.swing.JButton Return;
+    private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
 }

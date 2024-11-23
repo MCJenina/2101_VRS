@@ -372,81 +372,51 @@
           <SubComponents>
             <Component class="javax.swing.JLabel" name="ourVehicle1_SUVMitsubishiMontero">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle1_SUVMitsubihiMontero.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel1"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="ourVehicle2_SedanToyota">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle2_SedanToyota.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel2"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="ourVehicle3_SUVSuzuki">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle3_SUVSuzuki.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel3"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="ourVehicle4_SUVNissan">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle4_SUVNissan.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel4"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="ourVehicle5_SUVMazdaCX8">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle5_SUVMazdaCX8.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel5"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="ourVehicle6_VanToyotaSuperGrandia">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle6_VanToyotaSuperGrandia.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel6"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="ourVehicle7_CoasterToyota">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle7_CoasterToyota.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel7"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="ourVehicle8_MinivanKia">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle8_MinivanKia.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel8"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="ourVehicle9_MitsubishiL300">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle9_MitsubishiL300.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel9"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="ourVehicle10_SUVFord">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\Car Rental Images\ourVehicle10_SUVFord.jpg"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="jLabel10"/>
               </Properties>
             </Component>

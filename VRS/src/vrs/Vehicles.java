@@ -557,7 +557,7 @@ public class Vehicles extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+        Booking toFillUpForm = new Booking();
         toFillUpForm.show();
         
         dispose();
@@ -566,7 +566,7 @@ public class Vehicles extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+        Booking toFillUpForm = new Booking();
         toFillUpForm.show();
         
         dispose();
@@ -575,7 +575,7 @@ public class Vehicles extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+        Booking toFillUpForm = new Booking();
         toFillUpForm.show();
         
         dispose();
@@ -584,7 +584,7 @@ public class Vehicles extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+        Booking toFillUpForm = new Booking();
         toFillUpForm.show();
         
         dispose();
@@ -593,7 +593,7 @@ public class Vehicles extends javax.swing.JFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+        Booking toFillUpForm = new Booking();
         toFillUpForm.show();
         
         dispose();
@@ -602,7 +602,7 @@ public class Vehicles extends javax.swing.JFrame {
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+        Booking toFillUpForm = new Booking();
         toFillUpForm.show();
         
         dispose();
@@ -611,7 +611,7 @@ public class Vehicles extends javax.swing.JFrame {
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+        Booking toFillUpForm = new Booking();
         toFillUpForm.show();
         
         dispose();
@@ -620,7 +620,7 @@ public class Vehicles extends javax.swing.JFrame {
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+        Booking toFillUpForm = new Booking();
         toFillUpForm.show();
         
         dispose();
@@ -629,14 +629,16 @@ public class Vehicles extends javax.swing.JFrame {
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+        Booking toFillUpForm = new Booking();
         toFillUpForm.show();
+        
+        dispose();
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         // TODO add your handling code here:
         //to open the FillUpForm after selecting the Rent Now! button
-        FillUpForm toFillUpForm = new FillUpForm();
+       Booking toFillUpForm = new Booking();
         toFillUpForm.show();
         
         dispose();

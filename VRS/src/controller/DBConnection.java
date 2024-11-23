@@ -7,7 +7,7 @@ import javax.swing.*;
 public class DBConnection {  // Renaming to DBConnection to match Java conventions for Singleton
 
     private static final String username = "Jenina"; // Database username
-    private static final String password = "qwertyui"; // Database password
+    private static final String password = "qwertyuiop"; // Database password
     private static final String DB_URL = "jdbc:mysql://localhost:3306/vehiclerentalsystem?serverTimezone=UTC";
 
     
