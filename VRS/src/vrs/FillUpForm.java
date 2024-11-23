@@ -446,25 +446,26 @@ private Connection connection;
     
     // Get selected dates from JDateChooser components
     // Get the pickup and return dates
-    Date pickDate = pickupDate.getDate();
-    Date returnDate = ReturnDate.getDate();
+    //Date pickDate = pickupDate.getDate();
+    //Date returnDate = ReturnDate.getDate();
 
     // Check if either of the dates is null (meaning no date was selected)
-    if (pickDate == null || returnDate == null) {
+    if (pickupDate == null || ReturnDate == null) {
         JOptionPane.showMessageDialog(this, "Both pick-up and return dates are required.");
         return; // Exit the method if dates are not selected
     }
     
     // You can proceed with further logic if both dates are selected
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String pickupDateStr = sdf.format(pickDate);  // Format the pickup date
-    String returnDateStr = sdf.format(returnDate); // Format the return date
+    String pickupDateStr = sdf.format(pickupDate);  // Format the pickup date
+    String returnDateStr = sdf.format(ReturnDate); // Format the return date
     
-    // Additional validation for date range (Optional)
-    if (pickDate.after(returnDate)) {
-        JOptionPane.showMessageDialog(this, "Return date cannot be earlier than the pickup date.");
-        return; // Exit if the return date is before the pickup date
-    }
+     //Additional validation for date range (Optional)
+     //wait ka lang error ka. Sa return muna ako
+    //if (pickupDate.after(ReturnDate)) {
+        //JOptionPane.showMessageDialog(this, "Return date cannot be earlier than the pickup date.");
+        //return; // Exit if the return date is before the pickup date
+    //}
     
     // Now proceed with the rest of your form submission logic
     saveToDatabase(pickupDateStr, returnDateStr, destination, additionalFees);
