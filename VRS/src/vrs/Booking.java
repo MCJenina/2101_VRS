@@ -8,12 +8,44 @@ import javax.swing.table.DefaultTableModel;
 
 public class Booking extends javax.swing.JFrame {
     private Connection connection;
+    private Map<String, Double> placeFees = new HashMap<>(); // Map to store place fees
 
     public Booking() {
         initComponents();  // Initialize components (auto-generated in the GUI designer)
         connectDatabase();
         loadAvailableCars(); 
+        initializePlaceFees(); // Populate the map with place fees
+
+        // Attach the action listener to the JComboBox
+        places.addActionListener(evt -> placesActionPerformed(evt));//whenever a user selects a place from the JComboBox, the placesActionPerformed method runs, updating the additional fees
         // Load available cars
+        
+        //in here when the customer select car in the table it will show in the JTextField in the right side labeled Selected cars
+        // Add a ListSelectionListener to the table
+        Bookingtable.getSelectionModel().addListSelectionListener(e -> {
+        
+        // Ensure the event is for the correct table and row is selected
+        if (!e.getValueIsAdjusting() && Bookingtable.getSelectedRow() != -1) {
+       
+        // Get the selected row index
+        int selectedRow = Bookingtable.getSelectedRow();
+
+        // Retrieve the value of the "Model" column (column index 1)
+        String carModel = Bookingtable.getValueAt(selectedRow, 1).toString();
+
+        // Set the car model into the CarsGalingTable JTextField
+        CarsGalingTable.setText(carModel);
+        }
+    });
+        
+        
+}
+    // Method to populate place-to-fees mapping
+    private void initializePlaceFees() {
+        placeFees.put("Nasugbu Batangas", 150.0);
+        placeFees.put("Calatagan Batangas", 500.0);
+        placeFees.put("Calaca, Batangas", 300.0);
+        placeFees.put("Lemery, Batangas", 350.0);
     }
     
     // Method to connect to the database
@@ -111,10 +143,10 @@ public class Booking extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         cash = new javax.swing.JRadioButton();
         gcash = new javax.swing.JRadioButton();
-        pickupDateChooser = new com.toedter.calendar.JDateChooser();
-        returnDateChooser = new com.toedter.calendar.JDateChooser();
         CarsGalingTable = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
+        PickUpDate = new com.toedter.calendar.JDateChooser();
+        ReturnDate = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(130, 70, 52));
@@ -202,7 +234,7 @@ public class Booking extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(69, 69, 69)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(1280, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel7)
@@ -275,6 +307,12 @@ public class Booking extends javax.swing.JFrame {
         buttonGroup1.add(gcash);
         gcash.setText("Gcash");
 
+        CarsGalingTable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CarsGalingTableActionPerformed(evt);
+            }
+        });
+
         jLabel10.setText("Selected Car");
 
         javax.swing.GroupLayout BookingFillUpLayout = new javax.swing.GroupLayout(BookingFillUp);
@@ -286,31 +324,39 @@ public class Booking extends javax.swing.JFrame {
                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(BookingFillUpLayout.createSequentialGroup()
                         .addComponent(jLabel10)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())
                     .addGroup(BookingFillUpLayout.createSequentialGroup()
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(CarsGalingTable)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel8)
-                            .addComponent(Destination, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
-                            .addComponent(jLabel9)
-                            .addComponent(AdditionalFee, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
-                            .addComponent(places, 0, 180, Short.MAX_VALUE))
+                            .addComponent(Destination)
+                            .addComponent(AdditionalFee)
+                            .addComponent(places, 0, 180, Short.MAX_VALUE)
+                            .addGroup(BookingFillUpLayout.createSequentialGroup()
+                                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel8)
+                                    .addComponent(jLabel9))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGap(46, 46, 46)
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 73, Short.MAX_VALUE)
-                                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel11)
-                                    .addComponent(pickupDateChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-                                    .addComponent(returnDateChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(BookingFillUpLayout.createSequentialGroup()
+                                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel4)
+                                            .addGroup(BookingFillUpLayout.createSequentialGroup()
+                                                .addComponent(cash)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(gcash)))
+                                        .addGap(0, 55, Short.MAX_VALUE))
+                                    .addComponent(ReturnDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(PickUpDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(29, 29, 29))
                             .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                .addGap(46, 46, 46)
-                                .addComponent(cash)
-                                .addGap(18, 18, 18)
-                                .addComponent(gcash)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel11)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
             .addGroup(BookingFillUpLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(print)
@@ -321,24 +367,24 @@ public class Booking extends javax.swing.JFrame {
             .addGroup(BookingFillUpLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addComponent(jLabel10)
-                .addGap(18, 18, 18)
+                .addGap(22, 22, 22)
                 .addComponent(CarsGalingTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5))
+                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(BookingFillUpLayout.createSequentialGroup()
-                        .addComponent(pickupDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(PickUpDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel8))
+                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(returnDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Destination, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(Destination, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ReturnDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel9)
@@ -359,9 +405,9 @@ public class Booking extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 971, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(BookingFillUp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 942, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(BookingFillUp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addComponent(Bookpanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -476,10 +522,22 @@ private void bookCar(int customerId, int carId) {
 
     private void AdditionalFeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AdditionalFeeActionPerformed
         // TODO add your handling code here: Submitt Button
+        
+        // Extract destination from combo box
+        
     }//GEN-LAST:event_AdditionalFeeActionPerformed
 
     private void placesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_placesActionPerformed
+        //places JComboBox 
+        // Get the selected item from the combo box
+        String selectedPlace = (String) places.getSelectedItem();
 
+        // Set the selected place into the Destination text field
+        Destination.setText(selectedPlace);
+        
+        
+        Double fee = placeFees.getOrDefault(selectedPlace, 0.0);  // Get fee or default to 0.0
+        AdditionalFee.setText(String.format("%.2f", fee));    
     }//GEN-LAST:event_placesActionPerformed
 
     private void printActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printActionPerformed
@@ -488,8 +546,8 @@ private void bookCar(int customerId, int carId) {
         String receipt = "------------------ Payment Receipt ------------------\n"
         //+ "Car Id/Name: " + car_id.getText()+ "\n"
         + "Destination: " + places.getSelectedItem() + "\n"
-        + "Pick-Up Date: " + pickupDateChooser.getDate() + "\n"
-        + "Return Date: " + returnDateChooser.getDate() + "\n"
+       // + "Pick-Up Date: " + pickupDateChooser.getDate() + "\n"
+        //+ "Return Date: " + returnDateChooser.getDate() + "\n"
         + "----------------------------------------------------";
 
         // Use the Java Print API
@@ -515,6 +573,12 @@ private void bookCar(int customerId, int carId) {
         cd.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_CancelActionPerformed
+
+    private void CarsGalingTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CarsGalingTableActionPerformed
+        // TODO add your handling code here:
+        // to display the selected car here
+        
+    }//GEN-LAST:event_CarsGalingTableActionPerformed
 
     /**
      * @param args the command line arguments
@@ -568,6 +632,8 @@ private void bookCar(int customerId, int carId) {
     private javax.swing.JButton Cancel;
     private javax.swing.JTextField CarsGalingTable;
     private javax.swing.JTextField Destination;
+    private com.toedter.calendar.JDateChooser PickUpDate;
+    private com.toedter.calendar.JDateChooser ReturnDate;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton cash;
     private javax.swing.JRadioButton gcash;
@@ -584,9 +650,7 @@ private void bookCar(int customerId, int carId) {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private com.toedter.calendar.JDateChooser pickupDateChooser;
     private javax.swing.JComboBox<String> places;
     private javax.swing.JButton print;
-    private com.toedter.calendar.JDateChooser returnDateChooser;
     // End of variables declaration//GEN-END:variables
 }

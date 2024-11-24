@@ -9,5 +9,5 @@ package vrs;
  * @author jenina
  */
 public class WALALang {
-    
+    // HAHAHAHAHA ito ay wala lang ma-code
 }
