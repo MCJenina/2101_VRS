@@ -678,6 +678,7 @@ public class Vehicles extends javax.swing.JFrame {
                 new Vehicles().setVisible(true);
             }
         });
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

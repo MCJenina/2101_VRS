@@ -43,6 +43,11 @@ public class CustomerDashboard extends javax.swing.JFrame {
         });
 
         Return.setText("Return Now!");
+        Return.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ReturnActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("Log Out");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -93,6 +98,14 @@ public class CustomerDashboard extends javax.swing.JFrame {
                 dispose();  
             
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void ReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReturnActionPerformed
+        // TODO add your handling code here:
+        Returncar returnCar = new Returncar();
+        returnCar.setVisible(true);
+        this.dispose();
+                         
+    }//GEN-LAST:event_ReturnActionPerformed
 
     /**
      * @param args the command line arguments

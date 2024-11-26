@@ -103,7 +103,7 @@ public class Booking extends javax.swing.JFrame {
                     row[1] = rs.getString("Model");
                     row[2] = rs.getString("Type");
                     row[3] = rs.getString("Status");
-                    row[4] = rs.getDouble("Price");
+                    row[4] = rs.getDouble("Price");                 
                 }
                 model.addRow(row);
             }
@@ -125,6 +125,7 @@ public class Booking extends javax.swing.JFrame {
         Bookpanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         Cancel = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -159,7 +160,7 @@ public class Booking extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Model", "Type", "Status", "Price"
+                "Model", "Types", "Status", "Price"
             }
         ) {
             Class[] types = new Class [] {
@@ -187,6 +188,9 @@ public class Booking extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Mongolian Baiti", 1, 18)); // NOI18N
         jLabel6.setText("MANAGE BOOKING");
 
+        jLabel12.setFont(new java.awt.Font("Times New Roman", 2, 18)); // NOI18N
+        jLabel12.setText("Available Cars");
+
         javax.swing.GroupLayout BookpanelLayout = new javax.swing.GroupLayout(Bookpanel);
         Bookpanel.setLayout(BookpanelLayout);
         BookpanelLayout.setHorizontalGroup(
@@ -197,6 +201,10 @@ public class Booking extends javax.swing.JFrame {
                 .addGap(1052, 1052, 1052)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+            .addGroup(BookpanelLayout.createSequentialGroup()
+                .addGap(411, 411, 411)
+                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         BookpanelLayout.setVerticalGroup(
             BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -205,7 +213,9 @@ public class Booking extends javax.swing.JFrame {
                 .addGroup(BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel12)
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPanel2.setBackground(new java.awt.Color(255, 200, 105));
@@ -331,12 +341,9 @@ public class Booking extends javax.swing.JFrame {
                             .addComponent(Destination)
                             .addComponent(AdditionalFee)
                             .addComponent(places, 0, 180, Short.MAX_VALUE)
-                            .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel9))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel9))
                         .addGap(46, 46, 46)
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(BookingFillUpLayout.createSequentialGroup()
@@ -448,7 +455,7 @@ private void bookCar(int customerId, int carId) {
     // Queries
     String checkUserQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
     String checkQuery = "SELECT COUNT(*) FROM booking WHERE user_id = ? AND status = 'active'";
-    String insertQuery = "INSERT INTO booking (user_id, car_id, booking_date, status) VALUES (?, ?, NOW(), 'active')";
+    String insertQuery = "INSERT INTO booking (user_id, car_id, booking_date, , status) VALUES (?, ?, NOW(), 'active')";
     String updateCarQuery = "UPDATE cars SET status = 'Booked' WHERE car_id = ?";
 
     try {
@@ -479,11 +486,12 @@ private void bookCar(int customerId, int carId) {
                 return;  // Exit if the user has an active booking
             }
         }
+       
 
         // Step 3: Insert new booking
         try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
             insertStmt.setInt(1, customerId);  // The current user
-            insertStmt.setInt(2, carId);       // The selected car
+            insertStmt.setInt(2, carId);       // The selected car          
             insertStmt.executeUpdate();
         }
 
@@ -517,6 +525,16 @@ private void bookCar(int customerId, int carId) {
             ex.printStackTrace();
         }
     }
+    
+    // After booking is successful
+    String insertReturnQuery = "INSERT INTO returncar (car_id, user_id, ReturnDate, Fine) VALUES (?, ?, NULL, 0)";
+    try (PreparedStatement pstmt = connection.prepareStatement(insertReturnQuery)) {
+         pstmt.setInt(1, carId);  // Use the car_id from booking
+        pstmt.setInt(2, customerId); // Pass the associated user_id
+        pstmt.executeUpdate();
+    } catch (SQLException ex) {
+    ex.printStackTrace();
+}
 
     }//GEN-LAST:event_BOOK1ActionPerformed
 
@@ -640,6 +658,7 @@ private void bookCar(int customerId, int carId) {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
