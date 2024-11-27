@@ -68,10 +68,8 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Component id="damageCheckbox" min="-2" max="-2" attributes="0"/>
-                              <Component id="returnDateChooser" alignment="1" max="32767" attributes="0"/>
                               <Component id="bookingDateTextField" alignment="1" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace pref="163" max="32767" attributes="0"/>
@@ -108,11 +106,8 @@
                               <Component id="bookingDateTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                              <Component id="returnDateChooser" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <EmptySpace pref="18" max="32767" attributes="0"/>
+                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="damageCheckbox" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
@@ -196,8 +191,6 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Copyright - BSIT 2101(2024-2025). All Rights Reserved"/>
           </Properties>
-        </Component>
-        <Component class="com.toedter.calendar.JDateChooser" name="returnDateChooser">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
