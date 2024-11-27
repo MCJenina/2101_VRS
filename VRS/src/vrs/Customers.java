@@ -38,8 +38,7 @@ public class Customers extends javax.swing.JFrame {
     // Populates the customer table with data from the database
    private void populateCustomerTable() {
     String query = """
-        SELECT u.id AS customer_id, u.name AS customer_name, u.license_number, u.address,
-               IFNULL(b.status, 'No Booking') AS booking_status
+        SELECT u.id AS customer_id, u.name AS customer_name, u.license_number, u.address
         FROM users u
         LEFT JOIN booking b ON u.id = b.user_id AND b.status = 'active'
     """;
@@ -49,7 +48,7 @@ public class Customers extends javax.swing.JFrame {
          ResultSet rs = pst.executeQuery()) {
 
         DefaultTableModel model = new DefaultTableModel(
-            new String[]{"Customer ID", "Name", "License Number", "Address", "Booking Status"}, 0
+            new String[]{"Customer ID", "Name", "License Number", "Address"}, 0
         );
 
         while (rs.next()) {
@@ -57,8 +56,7 @@ public class Customers extends javax.swing.JFrame {
                 rs.getInt("customer_id"),
                 rs.getString("customer_name"),
                 rs.getString("license_number"),
-                rs.getString("address"),
-                rs.getString("booking_status")
+                rs.getString("address")
             });
         }
 
@@ -67,7 +65,7 @@ public class Customers extends javax.swing.JFrame {
     } catch (SQLException e) {
         showError("Error fetching customer data", e);
     }
-}
+   }
 
 
     // Checks if a customer has an active booking
@@ -100,30 +98,36 @@ public class Customers extends javax.swing.JFrame {
         }
     }
 
-    // Deletes a customer if they do not have an active booking
     private void deleteCustomer(int customerId) {
-        String deleteQuery = """
-            DELETE FROM users 
-            WHERE id = ? AND NOT EXISTS (SELECT 1 FROM booking WHERE user_id = ?)
-        """;
+    // SQL query to delete the customer if they don't have an active booking
+    String deleteQuery = """
+        DELETE FROM users 
+        WHERE id = ? AND NOT EXISTS (SELECT 1 FROM booking WHERE user_id = ? AND status = 'active')
+    """;
 
-        try (Connection conn = connectDatabase();
-             PreparedStatement pst = conn.prepareStatement(deleteQuery)) {
+    try (Connection conn = connectDatabase();
+         PreparedStatement pst = conn.prepareStatement(deleteQuery)) {
 
-            pst.setInt(1, customerId);
-            pst.setInt(2, customerId);
+        // Set the parameters for the delete query
+        pst.setInt(1, customerId);
+        pst.setInt(2, customerId);
 
-            int rowsAffected = pst.executeUpdate();
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Customer deleted successfully.");
-                populateCustomerTable(); // Refresh customer list
-            } else {
-                JOptionPane.showMessageDialog(this, "Customer cannot be deleted because they have an active booking.");
-            }
+        // Execute the delete query
+        int rowsAffected = pst.executeUpdate();
 
-        } catch (SQLException e) {
-            showError("Error deleting customer", e);
+        if (rowsAffected > 0) {
+            // Successfully deleted customer
+            JOptionPane.showMessageDialog(this, "Customer deleted successfully.");
+            populateCustomerTable(); // Refresh customer list
+        } else {
+            // Customer cannot be deleted because they have an active booking
+            JOptionPane.showMessageDialog(this, "Customer cannot be deleted because they have an active booking.");
         }
+
+    } catch (SQLException e) {
+        // Handle any SQL exceptions
+        showError("Error deleting customer", e);
+    }
     }
 
     // Executes a query that returns a single count
@@ -530,35 +534,186 @@ public class Customers extends javax.swing.JFrame {
 
     private void SearchCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchCustomerActionPerformed
         // TODO add your handling code here:
+         // Get the search term from the user
+    String searchTerm = CustomerTXT.getText().trim();
 
+    // Validate input
+    if (searchTerm.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter a name or license number to search.");
+        return;
+    }
+
+    // Ask for confirmation
+    int confirmation = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to search for \"" + searchTerm + "\"?",
+        "Confirm Search",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE
+    );
+
+    // Proceed only if the user confirms
+    if (confirmation == JOptionPane.YES_OPTION) {
+        // SQL query to search customers based on name or license number
+        String query = """
+            SELECT u.id AS customer_id, u.name AS customer_name, u.license_number, u.address,
+                   IFNULL(b.status, 'No Booking') AS booking_status
+            FROM users u
+            LEFT JOIN booking b ON u.id = b.user_id AND b.status = 'active'
+            WHERE u.name LIKE ? OR u.license_number LIKE ?
+        """;
+
+        try (Connection conn = connectDatabase();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+
+            // Set the search term with wildcards for partial matching
+            pst.setString(1, "%" + searchTerm + "%");
+            pst.setString(2, "%" + searchTerm + "%");
+
+            try (ResultSet rs = pst.executeQuery()) {
+                // Create a new table model for the search results
+                DefaultTableModel model = new DefaultTableModel(
+                    new String[]{"Customer ID", "Name", "License Number", "Address", "Booking Status"}, 0
+                );
+
+                // Populate the table model with results
+                while (rs.next()) {
+                    model.addRow(new Object[]{
+                        rs.getInt("customer_id"),
+                        rs.getString("customer_name"),
+                        rs.getString("license_number"),
+                        rs.getString("address"),
+                        rs.getString("booking_status")
+                    });
+                }
+
+                // Update the CustomersList table with the new model
+                CustomersList.setModel(model);
+
+                // Show a message if no results are found
+                if (model.getRowCount() == 0) {
+                    JOptionPane.showMessageDialog(this, "No matching customers found.");
+                }
+
+            }
+        } catch (SQLException e) {
+            showError("Error searching customer data", e);
+        }
+    } else {
+        // If the user cancels, just return
+        JOptionPane.showMessageDialog(this, "Search cancelled.");
+    }
     }//GEN-LAST:event_SearchCustomerActionPerformed
 
     private void DeleteCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteCustomerActionPerformed
-        // TODO add your handling code here:
-        int selectedRow = CustomersList.getSelectedRow();  // Get the selected row in the table
+       // Get the selected row in the customer table
+    int selectedRow = CustomersList.getSelectedRow();  
     if (selectedRow == -1) {
+        // No customer selected, show a message
         JOptionPane.showMessageDialog(this, "Please select a customer to delete.");
         return;
     }
 
-    // Get the Customer ID from the selected row (this should be the first column in your table)
+    // Get the Customer ID from the selected row (first column in the table)
     int customerId = (int) CustomersList.getValueAt(selectedRow, 0);
 
-    // Confirm deletion
-    int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this customer?", 
-                                                     "Delete Customer", JOptionPane.YES_NO_OPTION);
+    // Confirm the deletion
+    int confirmation = JOptionPane.showConfirmDialog(
+        this, 
+        "Are you sure you want to delete the customer with ID: " + customerId + "?",
+        "Delete Customer", 
+        JOptionPane.YES_NO_OPTION
+    );
+
     if (confirmation == JOptionPane.YES_OPTION) {
-        deleteCustomer(customerId);  // Call the deleteCustomer method
+        // If confirmed, perform the deletion
+        deleteCustomer(customerId);  // Call the deleteCustomer method here
+        populateCustomerTable();   // Refresh the customer table after deletion
+    } else {
+        // If canceled, display a message
+        JOptionPane.showMessageDialog(this, "Delete operation canceled.");
     }
+
     }//GEN-LAST:event_DeleteCustomerActionPerformed
 
     private void UpdateCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateCustomerActionPerformed
-        // TODO add your handling code here:
+        // Get the customer details from the input fields
+    String customerId = CustomerIDTXT.getText().trim();
+    String customerName = CustomerTXT.getText().trim();
+    String licenseNumber = CustomersLIcenseTXT.getText().trim();
+    String address = CustomersAddTXT.getText().trim();
+    
+    // Validate inputs
+    if (customerId.isEmpty() || customerName.isEmpty() || licenseNumber.isEmpty() || address.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please fill in all the fields.");
+        return;
+    }
 
+    // Confirm update
+    int confirmation = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to update the customer with ID \"" + customerId + "\"?",
+        "Confirm Update",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE
+    );
+
+    if (confirmation == JOptionPane.YES_OPTION) {
+        // SQL query to update the customer details
+        String query = """
+            UPDATE users 
+            SET name = ?, license_number = ?, address = ? 
+            WHERE id = ?
+        """;
+
+        try (Connection conn = connectDatabase();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+
+            // Set the parameters for the update query
+            pst.setString(1, customerName);     // First placeholder (name)
+            pst.setString(2, licenseNumber);   // Second placeholder (license_number)
+            pst.setString(3, address);         // Third placeholder (address)
+            pst.setString(4, customerId);      // Fourth placeholder (id)
+
+            // Execute the update query
+            int rowsAffected = pst.executeUpdate();
+
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Customer updated successfully.");
+                populateCustomerTable(); // Refresh the customer table after updating
+            } else {
+                JOptionPane.showMessageDialog(this, "Customer ID not found. No updates made.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error updating customer: " + e.getMessage());
+        }
+    } else {
+        // If the user cancels the update
+        JOptionPane.showMessageDialog(this, "Update cancelled.");
+    }
     }//GEN-LAST:event_UpdateCustomerActionPerformed
 
     private void RefrshCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefrshCustomerActionPerformed
         // TODO add your handling code here:
+        // Show confirmation dialog
+    int confirmation = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to refresh the customer data?",
+        "Confirm Refresh",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE
+    );
+
+    if (confirmation == JOptionPane.YES_OPTION) {
+        // Call the method to populate or refresh the customer table
+        populateCustomerTable();
+        JOptionPane.showMessageDialog(this, "Customer data refreshed successfully.");
+    } else {
+        // If the user cancels the refresh action
+        JOptionPane.showMessageDialog(this, "Refresh cancelled.");
+    }
     }//GEN-LAST:event_RefrshCustomerActionPerformed
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed

@@ -1,107 +1,238 @@
-package vrs;
+    package vrs;
 
-import java.sql.*;
-import java.sql.PreparedStatement;
-import javax.swing.JOptionPane;
-import javax.swing.*;
+    import java.sql.*;
+    import javax.swing.JOptionPane;
+    import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import javax.swing.table.DefaultTableModel;
-import java.time.LocalDate;
-
-/**
- *
- * @author OmarToufiq
- */
-public class Returncar extends javax.swing.JFrame {
-     private Connection connection;
+    /**
+     *
+     * @author OmarToufiq
+     */
+    public class Returncar extends javax.swing.JFrame {
+    private Connection connection;
+    private final int loggedInUserId;
 
     public Returncar() {
-       initComponents();
-       this.setTitle("Return Car");
-       connectDatabase();
-        populateBookedCarsTable(); 
-        ReturnCarsTable.setModel(new DefaultTableModel(
-        new Object[][]{},
-        new String[]{"Booking ID", "Car ID", "User ID", "Booking Date", "Return Date"}
-    ));
-     
-       // Set today's date
-        LocalDate today = LocalDate.now();
-     
-    }
-        // Method to connect to the database
-  private Connection connectDatabase() {
-    try {
-        String url = "jdbc:mysql://localhost:3306/vehiclerentalsystem?useSSL=false&serverTimezone=UTC";
-        String user = "Jenina";
-        String password = "qwertyuiop";
+       this.loggedInUserId = SessionManager.getCustomerId(); // Get user ID from Session Manager
+        System.out.println("Logged In User ID: " + loggedInUserId); // Debugging line to check user ID
+        initComponents();
+        this.setTitle("Return Car");
+        connectDatabase();
+        loadActiveBookings();
         
-        // Print to confirm the database connection
-        System.out.println("Attempting to connect to the database...");
-
-        connection = DriverManager.getConnection(url, user, password);
-        System.out.println("Database connection successful!");
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Failed to connect to the database: " + e.getMessage());
     }
-     return null; 
-}
-  
-private void populateBookedCarsTable() {
-    DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
-    model.setRowCount(0); // Clear existing rows
 
-    String query = "SELECT b.booking_id, c.Model, b.user_id, b.booking_date, b.ReturnDate "
-                 + "FROM booking b "
-                 + "JOIN cars c ON b.car_id = c.car_id "
-                 + "WHERE b.status = 'active'";
-
-    try (PreparedStatement stmt = connection.prepareStatement(query);
-         ResultSet rs = stmt.executeQuery()) {
-
-        while (rs.next()) {
-            model.addRow(new Object[] {
-                rs.getInt("booking_id"),
-                rs.getString("Model"),
-                rs.getInt("user_id"),
-                rs.getDate("booking_date"),
-                rs.getDate("ReturnDate")
-             
-            });
+    // Method to connect to the database
+    private Connection connectDatabase() {
+        try {
+            String url = "jdbc:mysql://localhost:3306/vehiclerentalsystem?useSSL=false&serverTimezone=UTC";
+            String user = "Jenina";
+            String password = "qwertyuiop";
+            connection = DriverManager.getConnection(url, user, password);
+            System.out.println("Database connection successful!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to connect to the database: " + e.getMessage());
         }
+        return connection;
+    }
+    // Method to load active bookings for the logged-in user
+private void loadActiveBookings() {
+    // Modified query to join ReturnCarsTable with CarsTable to fetch model based on car_id
+    // Since return_date was removed from booking, this query will no longer attempt to fetch it
+    String query = "SELECT r.booking_id, c.model, r.booking_date " +
+                   "FROM booking r " +
+                   "JOIN cars c ON r.car_id = c.car_id " +
+                   "WHERE r.user_id = ? AND r.status = 'active'";
+
+    try (PreparedStatement pst = connection.prepareStatement(query)) {
+        // Set the logged-in user's ID in the query
+        pst.setInt(1, loggedInUserId);
+
+        // Execute the query
+        ResultSet rs = pst.executeQuery();
+
+        // Clear existing rows in the table
+        DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
+        model.setRowCount(0); // Reset the table rows before adding new data
+
+        // Check if there are results in the database
+        boolean found = false;
+
+        // Populate the table with active booking data
+        while (rs.next()) { 
+            int bookingId = rs.getInt("booking_id");
+            String carModel = rs.getString("model"); // Retrieve the model name
+            Date startDate = rs.getDate("booking_date");
+
+            // Add data to the table row
+            model.addRow(new Object[]{bookingId, carModel, startDate});
+            found = true; // Data found
+        }
+
+        // If no data is found, show a message
+        if (!found) {
+            JOptionPane.showMessageDialog(this, "No active bookings found for the logged-in user.");
+        }
+
     } catch (SQLException e) {
         e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error fetching booked cars: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Failed to load active bookings: " + e.getMessage());
     }
-}
+}private boolean returnVehicle(int car_id, int bookingId, LocalDate userReturnDate, long lateFee, long damageFee) {
+    String getBookingDetailsQuery = "SELECT booking_date, car_id, user_id FROM booking WHERE booking_id = ? AND status = 'active'";
 
-private void returnCar(int bookingId) {
-    String updateQuery = "UPDATE booking SET status = 'returned' WHERE booking_id = ?";
+    String updateBookingStatusQuery = "UPDATE booking SET status = 'returned', booking_date = ?WHERE booking_id = ?";
 
-    try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
-        stmt.setInt(1, bookingId);
-        int rowsAffected = stmt.executeUpdate();
+    String updateCarStatusQuery = "UPDATE cars SET status = 'Available' WHERE car_id = ?";
 
-        if (rowsAffected > 0) {
-            JOptionPane.showMessageDialog(this, "Car returned successfully!");
-            populateBookedCarsTable(); // Refresh the table
+    try {
+        // Retrieve booking details from the database
+        LocalDate bookingDate = null;
+        LocalDate bookingReturnDate = null;
+        int carId = -1;
+        int userId = -1; // Initialize userId
+
+        try (PreparedStatement ps = connection.prepareStatement(getBookingDetailsQuery)) {
+            ps.setInt(1, bookingId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                bookingDate = rs.getDate("booking_date") != null ? rs.getDate("booking_date").toLocalDate() : null;
+                java.sql.Date returnDate = rs.getDate("booking_date");
+                if (returnDate != null) {
+                    bookingReturnDate = returnDate.toLocalDate();
+                }
+                carId = rs.getInt("car_id");
+                userId = rs.getInt("user_id");  // Retrieve user_id from booking table
+            } else {
+                JOptionPane.showMessageDialog(this, "Booking not found or already returned.");
+                return false;
+            }
+        }
+
+        if (bookingDate == null || bookingReturnDate == null) {
+            JOptionPane.showMessageDialog(this, "Booking date or return date is not available for this booking.");
+            return false;
+        }
+
+        long daysLate = ChronoUnit.DAYS.between(bookingReturnDate, userReturnDate);
+        if (daysLate > 0) {
+            lateFee = daysLate * 1000;
+            JOptionPane.showMessageDialog(this, "You are " + daysLate + " days late. Late fee: PHP " + lateFee);
         } else {
-            JOptionPane.showMessageDialog(this, "Error: Car not found or already returned.");
+            JOptionPane.showMessageDialog(this, "Returned on time. No late fee.");
         }
+
+        // Insert return data into the 'returns' table
+        if (!insertReturnData( bookingId, java.sql.Date.valueOf(userReturnDate), userId,car_id, lateFee, damageFee)) {
+            JOptionPane.showMessageDialog(this, "Failed to insert return data.");
+        }
+
+        // Update booking status to 'returned' and set the return date
+        try (PreparedStatement ps = connection.prepareStatement(updateBookingStatusQuery)) {
+            ps.setDate(1, java.sql.Date.valueOf(userReturnDate));
+            ps.setInt(2, bookingId);
+            ps.executeUpdate();
+        }
+
+        // Update car status to 'Available'
+        try (PreparedStatement ps = connection.prepareStatement(updateCarStatusQuery)) {
+            ps.setInt(1, carId);
+            ps.executeUpdate();
+        }
+
+        JOptionPane.showMessageDialog(this, "Vehicle returned successfully!");
+        return true;
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error processing return: " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    return false;
+}
+
+private boolean insertReturnData( int bookingId,  java.sql.Date userReturnDate,int car_id,int userId, long lateFee, long damageFee) {
+    String insertQuery = "INSERT INTO returns (  booking_id, return_date,car_id ,user_id, late_fee, damage_fee) VALUES (?, ?, ?, ?, ?, ?)";
+
+    try (PreparedStatement ps = connection.prepareStatement(insertQuery)) {
+        // Set each parameter in the prepared statement
+        ps.setInt(3, car_id);  // car_id
+        ps.setInt(4, userId);  // user_id (added to the query)
+        ps.setInt(1, bookingId);  // booking_id
+        ps.setDate(2, userReturnDate);  // return_date
+        ps.setLong(5, lateFee);  // late_fee
+        ps.setLong(6, damageFee);  // damage_fee
+
+        // Execute the insert query
+        int rowsAffected = ps.executeUpdate();
+        return rowsAffected > 0;  // Return true if insertion was successful
     } catch (SQLException e) {
         e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error updating car status: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Failed to insert return data: " + e.getMessage());
+        return false;
     }
 }
 
-   
- 
-  
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
+
+
+
+
+private long calculateLateFee(LocalDate bookingReturnDate, LocalDate userReturnDate) {
+
+// Convert java.util.Date to LocalDate
+            // Calculate the number of days late (if the returnDate is after the bookingReturnDate)
+     long daysLate = ChronoUnit.DAYS.between(bookingReturnDate, userReturnDate);
+
+     if (daysLate > 0) {
+        return daysLate * 1000; // 1000 is the late fee per day, adjust this if needed
+    }
+    
+    // Return 0 if the vehicle is returned on time or early
+    return 0;
+}private boolean updateBookingStatus(int bookingId) {
+    try {
+        // Database connection
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/vehiclerentalsystem?useSSL=false&serverTimezone=UTC", "Jenina","qwertyuiop");
+        String updateBookingStatusQuery = "UPDATE booking SET status = 'returned' WHERE booking_id = ?";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(updateBookingStatusQuery)) {
+            pstmt.setInt(1, bookingId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                // Successfully updated the status
+                return true;
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return false; // If update fails
+}
+private int getCarIdFromBooking(int bookingId) {
+    int carId = -1;
+    String query = "SELECT car_id FROM booking WHERE booking_id = ?";
+    try (PreparedStatement ps = connection.prepareStatement(query)) {
+        ps.setInt(1, bookingId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            carId = rs.getInt("car_id");
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error retrieving car_id: " + ex.getMessage());
+    }
+    return carId;
+}
+
+
+
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -113,6 +244,11 @@ private void returnCar(int bookingId) {
         jScrollPane1 = new javax.swing.JScrollPane();
         ReturnCarsTable = new javax.swing.JTable();
         jLabel7 = new javax.swing.JLabel();
+        returnDateChooser = new com.toedter.calendar.JDateChooser();
+        jLabel2 = new javax.swing.JLabel();
+        damageCheckbox = new javax.swing.JCheckBox();
+        bookingDateTextField = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -140,11 +276,11 @@ private void returnCar(int bookingId) {
 
             },
             new String [] {
-                "Booking ID", "Model", "User ID", "Booking Date", "Return Date", "Fine"
+                "Booking ID", "Model", "Booking Date"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.String.class, java.lang.Object.class, java.lang.Object.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -156,27 +292,48 @@ private void returnCar(int bookingId) {
         jLabel7.setFont(new java.awt.Font("Rockwell", 0, 10)); // NOI18N
         jLabel7.setText("Copyright - BSIT 2101(2024-2025). All Rights Reserved");
 
+        jLabel2.setText("Retrun Date: ");
+
+        damageCheckbox.setText("Is the vehicle damage?");
+        damageCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                damageCheckboxActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("Booking Date: ");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
+                .addGap(21, 21, 21)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 627, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(ReturnjButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(CanceljButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 627, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(23, Short.MAX_VALUE))
+                                .addComponent(CanceljButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 184, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(damageCheckbox)
+                            .addComponent(returnDateChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(bookingDateTextField, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addContainerGap(163, Short.MAX_VALUE))))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -185,25 +342,40 @@ private void returnCar(int bookingId) {
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ReturnjButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(CanceljButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jLabel7))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 98, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(ReturnjButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(CanceljButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel7))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(bookingDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel2)
+                            .addComponent(returnDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(damageCheckbox)
+                        .addGap(48, 48, 48))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -211,16 +383,74 @@ private void returnCar(int bookingId) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ReturnjButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReturnjButton1ActionPerformed
-        ReturnjButton1.addActionListener(e -> {
+    // Get the selected booking from the table
     int selectedRow = ReturnCarsTable.getSelectedRow();
-    if (selectedRow != -1) {
+
+    // Check if a booking is selected
+    if (selectedRow >= 0) {
+        // Get the booking details
         int bookingId = (int) ReturnCarsTable.getValueAt(selectedRow, 0);
-        returnCar(bookingId);
+        Date bookingReturnDate = (Date) ReturnCarsTable.getValueAt(selectedRow, 2); // Get the booking's expected return date
+        
+        // Check if bookingReturnDate is null and handle appropriately
+        if (bookingReturnDate != null) {
+            // Set the booking return date in the text field (assuming it's a JTextField)
+            bookingDateTextField.setText(bookingReturnDate.toString());  // Display the date in the TextField
+        } else {
+            JOptionPane.showMessageDialog(this, "No return date available for this booking.");
+            return;  // Exit if no return date is available
+        }
+
+        // Get the return date selected by the user (from JDateChooser or similar component)
+        java.util.Date userReturnDate = returnDateChooser.getDate();  // Get the selected date from JDateChooser
+
+        // Check if the user has selected a return date
+        if (userReturnDate == null) {
+            JOptionPane.showMessageDialog(this, "Please select a return date.");
+            return;  // Exit if no date is selected
+        }
+
+        // Convert java.util.Date to LocalDate
+        LocalDate localUserReturnDate = userReturnDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        // Convert the booking's return date (java.sql.Date) to LocalDate, with a null check
+        if (bookingReturnDate != null) {
+            LocalDate localBookingReturnDate = bookingReturnDate.toLocalDate();
+
+            // Calculate late fee if necessary
+            long lateFee = calculateLateFee(localBookingReturnDate, localUserReturnDate);
+
+            // Check if the damage checkbox is selected and calculate damage fee
+            long damageFee = 0;
+            if (damageCheckbox.isSelected()) {
+                damageFee = 500; // Assuming damage fee is a fixed amount, you can adjust this
+            }
+
+            // Retrieve car_id from the database using bookingId
+            int carId = getCarIdFromBooking(bookingId);
+
+            // Now, insert the return data into the returns table
+            boolean isReturnSuccessful = returnVehicle(carId, bookingId, localUserReturnDate, lateFee, damageFee);
+
+            if (isReturnSuccessful) {
+                // After returning, update the booking status to "returned"
+                updateBookingStatus(bookingId);
+
+                // After returning, remove the row from the table
+                DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
+                model.removeRow(selectedRow);
+
+                JOptionPane.showMessageDialog(this, "Vehicle returned successfully!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Return failed. Please check your return details.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Booking return date is missing.");
+        }
     } else {
-        JOptionPane.showMessageDialog(this, "Please select a car to return.");
+        JOptionPane.showMessageDialog(this, "Please select a booking to return.");
     }
-});
-    }//GEN-LAST:event_ReturnjButton1ActionPerformed
+        }//GEN-LAST:event_ReturnjButton1ActionPerformed
 
     private void CanceljButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CanceljButton2ActionPerformed
         // TODO add your handling code here:
@@ -228,6 +458,11 @@ private void returnCar(int bookingId) {
         customerDashboard.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_CanceljButton2ActionPerformed
+
+    private void damageCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_damageCheckboxActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_damageCheckboxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -260,23 +495,24 @@ private void returnCar(int bookingId) {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Returncar().setVisible(true);
+                Returncar returncar = new Returncar();
+            returncar.setVisible(true);  // Then show the window`
             }
         });
-        java.awt.EventQueue.invokeLater(() -> {
-        Returncar returncar = new Returncar();
-        returncar.setVisible(true);
-        returncar.populateBookedCarsTable(); // Ensures the table updates
-    });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CanceljButton2;
     private javax.swing.JTable ReturnCarsTable;
     private javax.swing.JButton ReturnjButton1;
+    private javax.swing.JTextField bookingDateTextField;
+    private javax.swing.JCheckBox damageCheckbox;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private com.toedter.calendar.JDateChooser returnDateChooser;
     // End of variables declaration//GEN-END:variables
 }

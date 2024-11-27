@@ -518,7 +518,7 @@ public class Car extends javax.swing.JFrame {
         // Validate that the price input is a valid number
         double price;
         try {
-            price = Double.parseDouble(priceText); // Convert price text to a double
+            price = Double.parseDouble(priceText);
             if (price <= 0) {
                 JOptionPane.showMessageDialog(this, "Price must be greater than 0.");
                 return;
@@ -528,45 +528,54 @@ public class Car extends javax.swing.JFrame {
             return;
         }
 
-        // SQL query to insert the new car into the database
-        String query = "INSERT INTO cars (car_id, Model, Type, Price, Status) VALUES (?, ?, ?, ?, ?)";
+        // Show confirmation dialog before proceeding
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to add this car?",
+            "Confirm Add",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
 
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            // Set the query parameters using the values from the input fields
-            pstmt.setString(1, carId);
-            pstmt.setString(2, carModel);
-            pstmt.setString(3, carType);
-            pstmt.setDouble(4, price);
-            pstmt.setString(5, status);
+        if (confirm == JOptionPane.YES_OPTION) {
+            // SQL query to insert the new car into the database
+            String query = "INSERT INTO cars (car_id, Model, Type, Price, Status) VALUES (?, ?, ?, ?, ?)";
 
-            // Execute the SQL query to insert the car
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Car added successfully!");
-                loadCarDetails(); // Refresh the car list on the GUI after adding
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to add the car. Please try again.");
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                // Set the query parameters
+                pstmt.setString(1, carId);
+                pstmt.setString(2, carModel);
+                pstmt.setString(3, carType);
+                pstmt.setDouble(4, price);
+                pstmt.setString(5, status);
+
+                // Execute the query
+                int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "Car added successfully!");
+                    loadCarDetails(); // Refresh the list after adding
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to add the car. Please try again.");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace(); // Print for debugging
+                JOptionPane.showMessageDialog(this, "Error adding car: " + ex.getMessage());
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace(); // Print the error for debugging purposes
-            JOptionPane.showMessageDialog(this, "Error adding car: " + ex.getMessage());
+
+            // Clear the input fields
+            CarIdTXT.setText("");
+            ModelTXT.setText("");
+            CarTypeTXT.setText("");
+            CarPriceTXT.setText("");
+            StatusCombo.setSelectedIndex(0);
+        } else {
+            JOptionPane.showMessageDialog(this, "Add operation canceled.");
         }
-
-        // Clear the input fields after successful addition
-        CarIdTXT.setText(""); // Clear the car ID text field
-        ModelTXT.setText(""); // Clear the car model text field
-        CarTypeTXT.setText(""); // Clear the car type text field
-        CarPriceTXT.setText(""); // Clear the car price text field
-        StatusCombo.setSelectedIndex(0); // Reset the status dropdown to the default value
-    
-
-
     }//GEN-LAST:event_ADDbuttonActionPerformed
 
     private void DELButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DELButtonActionPerformed
-        // Retrieve the Car ID from the text field
-        // Retrieve the Car ID from the text field
-        String carID = CarIdTXT.getText();
+         // Retrieve the Car ID from the text field
+        String carID = CarIdTXT.getText().trim();
 
         // Ensure the Car ID is not empty
         if (carID.isEmpty()) {
@@ -574,61 +583,108 @@ public class Car extends javax.swing.JFrame {
             return;
         }
 
-        // SQL query to delete the car with the specified Car ID
-        String query = "DELETE FROM cars WHERE car_id = ?";
+        // Show confirmation dialog before proceeding
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to delete the car with ID: " + carID + "?",
+            "Confirm Delete",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
 
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            // Set the Car ID parameter in the SQL query
-            pstmt.setString(1, carID);
+        if (confirm == JOptionPane.YES_OPTION) {
+            // SQL query to delete the car with the specified Car ID
+            String query = "DELETE FROM cars WHERE car_id = ?";
 
-            // Execute the deletion
-            int rowsAffected = pstmt.executeUpdate();
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                // Set the Car ID parameter in the SQL query
+                pstmt.setString(1, carID);
 
-            // Check if any rows were affected (i.e., if a car was deleted)
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Car deleted successfully.");
-                loadCarDetails();  // Refresh the table after deleting
-            } else {
-                JOptionPane.showMessageDialog(this, "Car ID not found.");
+                // Execute the deletion
+                int rowsAffected = pstmt.executeUpdate();
+
+                // Check if any rows were affected (i.e., if a car was deleted)
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "Car deleted successfully.");
+                    loadCarDetails();  // Refresh the table after deleting
+                } else {
+                    JOptionPane.showMessageDialog(this, "Car ID not found.");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();  // Print the exception for debugging purposes
+                JOptionPane.showMessageDialog(this, "Failed to delete car: " + ex.getMessage());
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to delete car.");
+        } else {
+            // If the user cancels the delete operation
+            JOptionPane.showMessageDialog(this, "Delete operation canceled.");
         }
 
     }//GEN-LAST:event_DELButtonActionPerformed
 
     private void UPButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UPButtonActionPerformed
-        // TODO add your handling code here:
-        String carID = CarIdTXT.getText();
-        String model = ModelTXT.getText();
-        String carType = CarTypeTXT.getText();
-        String price = CarPriceTXT.getText();
-        String status = (String) StatusCombo.getSelectedItem();
+         // Collect input from text fields and combo box
+    String carID = CarIdTXT.getText();
+    String model = ModelTXT.getText();
+    String carType = CarTypeTXT.getText();
+    String price = CarPriceTXT.getText();
+    String status = (String) StatusCombo.getSelectedItem();
 
-        String query = "UPDATE cars SET Model = ?, Type = ?, Price = ?, Status = ? WHERE CarID = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, model);
-            pstmt.setString(2, carType);
-            pstmt.setString(3, price);
-            pstmt.setString(4, status);
-            pstmt.setString(5, carID);
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Car updated successfully.");
-                loadCarDetails();  // Refresh the table after updating
-            } else {
-                JOptionPane.showMessageDialog(this, "Car ID not found.");
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to update car.");
+    // Validate inputs
+    if (carID.isEmpty() || model.isEmpty() || carType.isEmpty() || price.isEmpty() || status.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please fill out all fields.");
+        return;
+    }
+
+    // SQL query to update car details
+    String query = "UPDATE cars SET Model = ?, Type = ?, Price = ?, Status = ? WHERE CarID = ?";
+
+    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        // Set parameters for the query
+        pstmt.setString(1, model);
+        pstmt.setString(2, carType);
+        pstmt.setString(3, price);
+        pstmt.setString(4, status);
+        pstmt.setString(5, carID);
+
+        // Execute the update query
+        int rowsAffected = pstmt.executeUpdate();
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(this, "Car details updated successfully.");
+            loadCarDetails();  // Refresh the car details in the table
+        } else {
+            JOptionPane.showMessageDialog(this, "Car ID not found. Update failed.");
         }
-
+    } catch (SQLException ex) {
+        ex.printStackTrace(); // Debugging purposes
+        JOptionPane.showMessageDialog(this, "Error updating car details: " + ex.getMessage());
+    }
     }//GEN-LAST:event_UPButtonActionPerformed
 
     private void REFButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_REFButtonActionPerformed
         // TODO add your handling code here:
+         // Show a confirmation dialog
+    int confirm = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to refresh the car details?",
+        "Confirm Refresh",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE
+    );
+
+    // If the user clicks "Yes"
+    if (confirm == JOptionPane.YES_OPTION) {
+        try {
+            // Call the method to reload car details
+            loadCarDetails();
+            JOptionPane.showMessageDialog(this, "Car details refreshed successfully.");
+        } catch (Exception ex) {
+            ex.printStackTrace(); // For debugging
+            JOptionPane.showMessageDialog(this, "Failed to refresh car details: " + ex.getMessage());
+        }
+    } else {
+        // If the user clicks "No", do nothing
+        JOptionPane.showMessageDialog(this, "Refresh canceled.");
+    }
 
     }//GEN-LAST:event_REFButtonActionPerformed
 

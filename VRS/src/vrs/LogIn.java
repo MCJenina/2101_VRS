@@ -56,6 +56,7 @@ public class LogIn extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(255, 200, 105));
         jPanel1.setPreferredSize(new java.awt.Dimension(658, 470));
 
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/main/java/imagestorage/copy (2).jpg"))); // NOI18N
         jLabel1.setText("jLabel1");
 
         jLabel2.setBackground(new java.awt.Color(255, 255, 255));
@@ -167,7 +168,7 @@ public class LogIn extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(SignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 

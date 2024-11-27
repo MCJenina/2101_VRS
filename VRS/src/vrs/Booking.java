@@ -8,7 +8,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class Booking extends javax.swing.JFrame {
     private Connection connection;
-    private Map<String, Double> placeFees = new HashMap<>(); // Map to store place fees
+    private final Map<String, Double> placeFees = new HashMap<>(); // Map to store place fees
 
     public Booking() {
         initComponents();  // Initialize components (auto-generated in the GUI designer)
@@ -132,7 +132,6 @@ public class Booking extends javax.swing.JFrame {
         BOOK1 = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         BookingFillUp = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
@@ -147,7 +146,6 @@ public class Booking extends javax.swing.JFrame {
         CarsGalingTable = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         PickUpDate = new com.toedter.calendar.JDateChooser();
-        ReturnDate = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(130, 70, 52));
@@ -250,7 +248,7 @@ public class Booking extends javax.swing.JFrame {
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(BOOK1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(26, 26, 26))
         );
@@ -273,8 +271,6 @@ public class Booking extends javax.swing.JFrame {
 
         BookingFillUp.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         BookingFillUp.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-
-        jLabel4.setText("Return Date");
 
         jLabel5.setText("Places");
 
@@ -347,22 +343,16 @@ public class Booking extends javax.swing.JFrame {
                         .addGap(46, 46, 46)
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel4)
-                                            .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                                .addComponent(cash)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(gcash)))
-                                        .addGap(0, 55, Short.MAX_VALUE))
-                                    .addComponent(ReturnDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(PickUpDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(PickUpDate, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                                 .addGap(29, 29, 29))
                             .addGroup(BookingFillUpLayout.createSequentialGroup()
                                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel11)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(BookingFillUpLayout.createSequentialGroup()
+                                        .addComponent(cash)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(gcash)))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
             .addGroup(BookingFillUpLayout.createSequentialGroup()
                 .addContainerGap()
@@ -372,36 +362,35 @@ public class Booking extends javax.swing.JFrame {
         BookingFillUpLayout.setVerticalGroup(
             BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(BookingFillUpLayout.createSequentialGroup()
-                .addGap(25, 25, 25)
+                .addGap(35, 35, 35)
                 .addComponent(jLabel10)
-                .addGap(22, 22, 22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(CarsGalingTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(BookingFillUpLayout.createSequentialGroup()
-                        .addComponent(PickUpDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(Destination, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(ReturnDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel11))
-                        .addGap(18, 18, 18)
-                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(AdditionalFee, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cash)
-                            .addComponent(gcash)))
+                    .addComponent(PickUpDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(places, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(BookingFillUpLayout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Destination, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(BookingFillUpLayout.createSequentialGroup()
+                        .addGap(37, 37, 37)
+                        .addComponent(jLabel11)
+                        .addGap(18, 18, 18)
+                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cash)
+                            .addComponent(gcash))))
+                .addGap(4, 4, 4)
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(AdditionalFee, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(79, 79, 79)
                 .addComponent(print)
                 .addGap(16, 16, 16))
@@ -435,8 +424,7 @@ public class Booking extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BOOK1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BOOK1ActionPerformed
-    // TODO add your handling code here:
-      // Step 1: Check if a car is selected from the table
+     // Step 1: Check if a car is selected from the table
     int selectedRow = Bookingtable.getSelectedRow();
     if (selectedRow == -1) {
         JOptionPane.showMessageDialog(this, "Please select a car to book.");
@@ -444,19 +432,19 @@ public class Booking extends javax.swing.JFrame {
     }
 
     // Step 2: Get the car ID from the selected row
-    int carId = (int) Bookingtable.getValueAt(selectedRow, 0); // Assuming first column is the car ID
+    int carId = (int) Bookingtable.getValueAt(selectedRow, 0); // Assuming first column is car ID
     int customerId = SessionManager.getCustomerId();  // Retrieve current logged-in customer ID
 
-    // Step 3: Attempt to book the car
+    // Proceed to book the car
     bookCar(customerId, carId);
 }
-
 private void bookCar(int customerId, int carId) {
     // Queries
     String checkUserQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
-    String checkQuery = "SELECT COUNT(*) FROM booking WHERE user_id = ? AND status = 'active'";
-    String insertQuery = "INSERT INTO booking (user_id, car_id, booking_date, , status) VALUES (?, ?, NOW(), 'active')";
+    String checkActiveBookingQuery = "SELECT COUNT(*) FROM booking WHERE user_id = ? AND status = 'active'";
+    String insertQuery = "INSERT INTO booking (user_id, car_id, booking_date, status) VALUES (?, ?, NOW(), 'active')";
     String updateCarQuery = "UPDATE cars SET status = 'Booked' WHERE car_id = ?";
+    String getBookingIdQuery = "SELECT booking_id FROM booking WHERE user_id = ? AND car_id = ? AND status = 'active' ORDER BY booking_date DESC LIMIT 1";
 
     try {
         // Begin transaction
@@ -464,49 +452,60 @@ private void bookCar(int customerId, int carId) {
 
         // Step 1: Check if the user exists
         try (PreparedStatement checkUserStmt = connection.prepareStatement(checkUserQuery)) {
-            checkUserStmt.setInt(1, customerId);  // Check if the customer exists
+            checkUserStmt.setInt(1, customerId);
             ResultSet rsUser = checkUserStmt.executeQuery();
 
             if (rsUser.next() && rsUser.getInt(1) == 0) {
                 JOptionPane.showMessageDialog(this, "Customer does not exist.");
-                return;  // Exit if the customer doesn't exist
+                return;
             }
         }
 
         // Step 2: Check for active booking
-        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
-            checkStmt.setInt(1, customerId);  // Set customerId
-            ResultSet rs = checkStmt.executeQuery();
+        try (PreparedStatement checkBookingStmt = connection.prepareStatement(checkActiveBookingQuery)) {
+            checkBookingStmt.setInt(1, customerId);
+            ResultSet rsBooking = checkBookingStmt.executeQuery();
 
-            // Debugging output
-            System.out.println("Checking active booking for customerId: " + customerId);
-
-            if (rs.next() && rs.getInt(1) > 0) {
-                JOptionPane.showMessageDialog(this, "You already have an active booking.");
-                return;  // Exit if the user has an active booking
+            if (rsBooking.next() && rsBooking.getInt(1) > 0) {
+                JOptionPane.showMessageDialog(this, "You already have an active booking. Please return the vehicle first.");
+                return;
             }
         }
-       
 
         // Step 3: Insert new booking
-        try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
-            insertStmt.setInt(1, customerId);  // The current user
-            insertStmt.setInt(2, carId);       // The selected car          
-            insertStmt.executeUpdate();
+        try (PreparedStatement insertBookingStmt = connection.prepareStatement(insertQuery)) {
+            insertBookingStmt.setInt(1, customerId);
+            insertBookingStmt.setInt(2, carId);
+
+            int rowsAffected = insertBookingStmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Booking successful!");
+            }
         }
 
         // Step 4: Update car status
         try (PreparedStatement updateCarStmt = connection.prepareStatement(updateCarQuery)) {
-            updateCarStmt.setInt(1, carId);  // Update car status
+            updateCarStmt.setInt(1, carId);
             updateCarStmt.executeUpdate();
         }
 
         // Commit the transaction
         connection.commit();
-        JOptionPane.showMessageDialog(this, "Car booked successfully!");
 
-        // Step 5: Refresh available cars
-        loadAvailableCars();  // Refresh car list after booking
+        // Step 5: Retrieve and display booking ID
+        try (PreparedStatement getBookingIdStmt = connection.prepareStatement(getBookingIdQuery)) {
+            getBookingIdStmt.setInt(1, customerId);
+            getBookingIdStmt.setInt(2, carId);
+            ResultSet rsBookingId = getBookingIdStmt.executeQuery();
+
+            if (rsBookingId.next()) {
+                int bookingId = rsBookingId.getInt("booking_id");
+                JOptionPane.showMessageDialog(this, "Booking ID: " + bookingId);
+            }
+        }
+
+        // Refresh available cars
+        loadAvailableCars();
 
     } catch (SQLException e) {
         // Rollback in case of errors
@@ -525,16 +524,6 @@ private void bookCar(int customerId, int carId) {
             ex.printStackTrace();
         }
     }
-    
-    // After booking is successful
-    String insertReturnQuery = "INSERT INTO returncar (car_id, user_id, ReturnDate, Fine) VALUES (?, ?, NULL, 0)";
-    try (PreparedStatement pstmt = connection.prepareStatement(insertReturnQuery)) {
-         pstmt.setInt(1, carId);  // Use the car_id from booking
-        pstmt.setInt(2, customerId); // Pass the associated user_id
-        pstmt.executeUpdate();
-    } catch (SQLException ex) {
-    ex.printStackTrace();
-}
 
     }//GEN-LAST:event_BOOK1ActionPerformed
 
@@ -564,8 +553,7 @@ private void bookCar(int customerId, int carId) {
         String receipt = "------------------ Payment Receipt ------------------\n"
         //+ "Car Id/Name: " + car_id.getText()+ "\n"
         + "Destination: " + places.getSelectedItem() + "\n"
-       // + "Pick-Up Date: " + pickupDateChooser.getDate() + "\n"
-        //+ "Return Date: " + returnDateChooser.getDate() + "\n"
+        //+ "Pick-Up Date: " + pickupDateChooser.getDate() + "\n"
         + "----------------------------------------------------";
 
         // Use the Java Print API
@@ -651,7 +639,6 @@ private void bookCar(int customerId, int carId) {
     private javax.swing.JTextField CarsGalingTable;
     private javax.swing.JTextField Destination;
     private com.toedter.calendar.JDateChooser PickUpDate;
-    private com.toedter.calendar.JDateChooser ReturnDate;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton cash;
     private javax.swing.JRadioButton gcash;
@@ -661,7 +648,6 @@ private void bookCar(int customerId, int carId) {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
