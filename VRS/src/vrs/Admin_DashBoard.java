@@ -5,7 +5,7 @@
 package vrs;
 
 /**
- *
+ *GEABEEEEEE HIRAP NA AKOOOOO
  * @author baldo
  */
 public class Admin_DashBoard extends javax.swing.JFrame {

@@ -173,7 +173,7 @@ public class CustomerDashboard extends javax.swing.JFrame {
 
     private void BookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BookActionPerformed
         // TODO add your handling code here:
-        Vehicles fill = new Vehicles(); //  Vehicles fill = new Vehicles();
+        Booking fill = new Booking(); //  Vehicles fill = new Vehicles();
         fill.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_BookActionPerformed
