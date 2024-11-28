@@ -3,13 +3,10 @@
     import java.sql.*;
     import javax.swing.JOptionPane;
     import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import javax.swing.table.DefaultTableModel;
-    /**
-     *
-     * @author OmarToufiq
-     */
+    import java.time.ZoneId;
+    import java.time.temporal.ChronoUnit;
+    import javax.swing.table.DefaultTableModel;
+    
     public class Returncar extends javax.swing.JFrame {
     private Connection connection;
     private final int loggedInUserId;
@@ -21,6 +18,8 @@ import javax.swing.table.DefaultTableModel;
         this.setTitle("Return Car");
         connectDatabase();
         loadActiveBookings();
+        
+      
         
     }
 
@@ -39,7 +38,7 @@ import javax.swing.table.DefaultTableModel;
         return connection;
     }
     // Method to load active bookings for the logged-in user
-private void loadActiveBookings() {
+    private void loadActiveBookings() {
     // Modified query to join ReturnCarsTable with CarsTable to fetch model based on car_id
     // Since return_date was removed from booking, this query will no longer attempt to fetch it
     String query = "SELECT r.booking_id, c.model, r.booking_date " +
@@ -81,7 +80,8 @@ private void loadActiveBookings() {
         e.printStackTrace();
         JOptionPane.showMessageDialog(this, "Failed to load active bookings: " + e.getMessage());
     }
-}private boolean returnVehicle(int car_id, int bookingId, LocalDate userReturnDate, long lateFee, long damageFee) {
+}
+    private boolean returnVehicle(int car_id, int bookingId, LocalDate userReturnDate, long lateFee, long damageFee) {
     String getBookingDetailsQuery = "SELECT booking_date, car_id, user_id FROM booking WHERE booking_id = ? AND status = 'active'";
 
     String updateBookingStatusQuery = "UPDATE booking SET status = 'returned', booking_date = ?WHERE booking_id = ?";
@@ -178,9 +178,6 @@ private boolean insertReturnData( int bookingId,  java.sql.Date userReturnDate,i
 }
 
 
-
-
-
 private long calculateLateFee(LocalDate bookingReturnDate, LocalDate userReturnDate) {
 
 // Convert java.util.Date to LocalDate
@@ -248,6 +245,8 @@ private int getCarIdFromBooking(int bookingId) {
         damageCheckbox = new javax.swing.JCheckBox();
         bookingDateTextField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
+        returnDateChooser = new com.toedter.calendar.JDateChooser();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -302,6 +301,13 @@ private int getCarIdFromBooking(int bookingId) {
 
         jLabel3.setText("Booking Date: ");
 
+        jButton1.setText("Print Receipt");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -323,9 +329,12 @@ private int getCarIdFromBooking(int bookingId) {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3)
                                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(damageCheckbox)
-                            .addComponent(bookingDateTextField, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(damageCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(bookingDateTextField, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(returnDateChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jButton1))
                         .addContainerGap(163, Short.MAX_VALUE))))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
@@ -352,25 +361,26 @@ private int getCarIdFromBooking(int bookingId) {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(bookingDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
-                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(returnDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addComponent(damageCheckbox)
-                        .addGap(48, 48, 48))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton1)
+                        .addGap(13, 13, 13))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 665, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -459,6 +469,47 @@ private int getCarIdFromBooking(int bookingId) {
 
     }//GEN-LAST:event_damageCheckboxActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+         // Create a string representing the receipt
+          // Retrieve selected row from the table
+        int selectedRow = ReturnCarsTable.getSelectedRow();
+        if (selectedRow != -1) {
+        // Get booking details from the table model
+        DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
+        int bookingId = (int) model.getValueAt(selectedRow, 0); // Assuming bookingId is in column 0
+        String carModel = (String) model.getValueAt(selectedRow, 1); // Assuming carModel is in column 1
+        Date bookingDate = (Date) model.getValueAt(selectedRow, 2); // Assuming bookingDate is in column 2
+
+        // Assume userReturnDate, lateFee, and damageFee are already calculated
+        LocalDate userReturnDate = LocalDate.now(); // Example: Set to current date
+        long lateFee = calculateLateFee(bookingDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), userReturnDate);
+        long damageFee = damageCheckbox.isSelected() ? 500 : 0; // Example damage fee logic
+
+         
+        String receipt = "------------------ Payment Receipt ------------------\n"
+        
+        + "Booking ID: " + bookingId + "\n"
+        + "Car Model: " + carModel + "\n"
+        + "Booking Date: " + bookingDate + "\n"
+        + "Return Date: " + userReturnDate + "\n"
+        + "Late Fee: PHP " + lateFee + "\n"
+        + "Damage Fee: PHP " + damageFee + "\n"
+        + "----------------------------------------------------";
+        
+        // Use the Java Print API
+        try {
+            boolean complete = new javax.swing.JTextArea(receipt).print();
+            if (complete) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Receipt printed successfully.");
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Printing was canceled.");
+            }
+        } catch (java.awt.print.PrinterException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+    }
     /**
      * @param args the command line arguments
      */
@@ -502,11 +553,13 @@ private int getCarIdFromBooking(int bookingId) {
     private javax.swing.JButton ReturnjButton1;
     private javax.swing.JTextField bookingDateTextField;
     private javax.swing.JCheckBox damageCheckbox;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private com.toedter.calendar.JDateChooser returnDateChooser;
     // End of variables declaration//GEN-END:variables
 }

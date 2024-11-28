@@ -91,7 +91,7 @@ public class LogIn extends javax.swing.JFrame {
         });
 
         LogIn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        LogIn.setText("LogIn");
+        LogIn.setText("Log In");
         LogIn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 LogInActionPerformed(evt);
@@ -226,7 +226,7 @@ public class LogIn extends javax.swing.JFrame {
 
                 // Admin role check
                 if ("admin".equals(role)) {
-                    AdminDashboard adminDashboard = new AdminDashboard();
+                    Admin_DashBoard adminDashboard = new Admin_DashBoard();
                     adminDashboard.setVisible(true);
                     this.dispose();
                 } else {

@@ -691,7 +691,7 @@ public class Car extends javax.swing.JFrame {
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
         // TODO add your handling code here:
-        AdminDashboard adminDashboard = new AdminDashboard();
+        Admin_DashBoard adminDashboard = new Admin_DashBoard();
         adminDashboard.setVisible(true);
         this.dispose();
 

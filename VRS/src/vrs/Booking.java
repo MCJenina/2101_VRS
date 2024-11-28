@@ -145,7 +145,6 @@ public class Booking extends javax.swing.JFrame {
         gcash = new javax.swing.JRadioButton();
         CarsGalingTable = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
-        PickUpDate = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(130, 70, 52));
@@ -330,7 +329,7 @@ public class Booking extends javax.swing.JFrame {
                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(BookingFillUpLayout.createSequentialGroup()
                         .addComponent(jLabel10)
-                        .addContainerGap())
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(BookingFillUpLayout.createSequentialGroup()
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(CarsGalingTable)
@@ -342,18 +341,13 @@ public class Booking extends javax.swing.JFrame {
                             .addComponent(jLabel9))
                         .addGap(46, 46, 46)
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel11)
                             .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                .addComponent(PickUpDate, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-                                .addGap(29, 29, 29))
-                            .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel11)
-                                    .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                        .addComponent(cash)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(gcash)))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
+                                .addComponent(cash)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(gcash)))
+                        .addContainerGap(90, Short.MAX_VALUE))))
             .addGroup(BookingFillUpLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(print)
@@ -371,9 +365,7 @@ public class Booking extends javax.swing.JFrame {
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(PickUpDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(places, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(places, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(BookingFillUpLayout.createSequentialGroup()
                         .addGap(22, 22, 22)
@@ -638,7 +630,6 @@ private void bookCar(int customerId, int carId) {
     private javax.swing.JButton Cancel;
     private javax.swing.JTextField CarsGalingTable;
     private javax.swing.JTextField Destination;
-    private com.toedter.calendar.JDateChooser PickUpDate;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton cash;
     private javax.swing.JRadioButton gcash;
