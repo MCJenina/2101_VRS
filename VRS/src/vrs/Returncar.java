@@ -1,11 +1,17 @@
     package vrs;
 
+import java.awt.print.PrinterException;
     import java.sql.*;
     import javax.swing.JOptionPane;
     import java.time.LocalDate;
     import java.time.ZoneId;
     import java.time.temporal.ChronoUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JTextArea;
     import javax.swing.table.DefaultTableModel;
+import vrs.CustomerDashboard;
+import vrs.SessionManager;
     
     public class Returncar extends javax.swing.JFrame {
     private Connection connection;
@@ -245,8 +251,8 @@ private int getCarIdFromBooking(int bookingId) {
         damageCheckbox = new javax.swing.JCheckBox();
         bookingDateTextField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        returnDateChooser = new com.toedter.calendar.JDateChooser();
         jButton1 = new javax.swing.JButton();
+        returnDateChooser = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -329,12 +335,11 @@ private int getCarIdFromBooking(int bookingId) {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3)
                                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(damageCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(bookingDateTextField, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(returnDateChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(jButton1))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(damageCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(bookingDateTextField, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButton1)
+                            .addComponent(returnDateChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap(163, Short.MAX_VALUE))))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
@@ -365,7 +370,7 @@ private int getCarIdFromBooking(int bookingId) {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
                             .addComponent(returnDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
+                        .addGap(14, 14, 14)
                         .addComponent(damageCheckbox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton1)
@@ -470,11 +475,12 @@ private int getCarIdFromBooking(int bookingId) {
     }//GEN-LAST:event_damageCheckboxActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-         // Create a string representing the receipt
-          // Retrieve selected row from the table
-        int selectedRow = ReturnCarsTable.getSelectedRow();
-        if (selectedRow != -1) {
+                                      
+
+    // TODO add your handling code here:
+    // Retrieve selected row from the table
+    int selectedRow = ReturnCarsTable.getSelectedRow();
+    if (selectedRow != -1) {
         // Get booking details from the table model
         DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
         int bookingId = (int) model.getValueAt(selectedRow, 0); // Assuming bookingId is in column 0
@@ -486,28 +492,34 @@ private int getCarIdFromBooking(int bookingId) {
         long lateFee = calculateLateFee(bookingDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), userReturnDate);
         long damageFee = damageCheckbox.isSelected() ? 500 : 0; // Example damage fee logic
 
-         
+        // Create a string representing the receipt
         String receipt = "------------------ Payment Receipt ------------------\n"
-        
-        + "Booking ID: " + bookingId + "\n"
-        + "Car Model: " + carModel + "\n"
-        + "Booking Date: " + bookingDate + "\n"
-        + "Return Date: " + userReturnDate + "\n"
-        + "Late Fee: PHP " + lateFee + "\n"
-        + "Damage Fee: PHP " + damageFee + "\n"
-        + "----------------------------------------------------";
-        
+                + "Booking ID: " + bookingId + "\n"
+                + "Car Model: " + carModel + "\n"
+                + "Booking Date: " + bookingDate + "\n"
+                + "Return Date: " + userReturnDate + "\n"
+                + "Late Fee: PHP " + lateFee + "\n"
+                + "Damage Fee: PHP " + damageFee + "\n"
+                + "----------------------------------------------------";
+
+        // Create a JTextArea to display and print the receipt
+        JTextArea textArea = new JTextArea();
+        textArea.setText(receipt);
+        textArea.setEditable(false);
+
         // Use the Java Print API
+        boolean complete = false;
         try {
-            boolean complete = new javax.swing.JTextArea(receipt).print();
-            if (complete) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Receipt printed successfully.");
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Printing was canceled.");
-            }
-        } catch (java.awt.print.PrinterException ex) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            complete = textArea.print();
+        } catch (PrinterException ex) {
+            Logger.getLogger(Returncar.class.getName()).log(Level.SEVERE, null, ex);
         }
+        if (complete) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Receipt printed successfully.");
+        } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Printing was canceled.");
+        }
+    
     }//GEN-LAST:event_jButton1ActionPerformed
     }
     /**

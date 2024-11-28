@@ -64,13 +64,11 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="damageCheckbox" max="32767" attributes="0"/>
-                                  <Component id="bookingDateTextField" alignment="1" max="32767" attributes="0"/>
-                                  <Component id="returnDateChooser" max="32767" attributes="0"/>
-                              </Group>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="damageCheckbox" max="32767" attributes="0"/>
+                              <Component id="bookingDateTextField" alignment="1" max="32767" attributes="0"/>
                               <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                              <Component id="returnDateChooser" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace pref="163" max="32767" attributes="0"/>
                       </Group>
@@ -111,7 +109,7 @@
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                               <Component id="returnDateChooser" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                           <Component id="damageCheckbox" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jButton1" min="-2" max="-2" attributes="0"/>
@@ -217,8 +215,6 @@
             <Property name="text" type="java.lang.String" value="Booking Date: "/>
           </Properties>
         </Component>
-        <Component class="com.toedter.calendar.JDateChooser" name="returnDateChooser">
-        </Component>
         <Component class="javax.swing.JButton" name="jButton1">
           <Properties>
             <Property name="text" type="java.lang.String" value="Print Receipt"/>
@@ -226,6 +222,8 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="com.toedter.calendar.JDateChooser" name="returnDateChooser">
         </Component>
       </SubComponents>
     </Container>

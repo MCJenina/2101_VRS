@@ -637,7 +637,7 @@ public class Car extends javax.swing.JFrame {
     }
 
     // SQL query to update car details
-    String query = "UPDATE cars SET Model = ?, Type = ?, Price = ?, Status = ? WHERE CarID = ?";
+    String query = "UPDATE cars SET Model = ?, Type = ?, Price = ?, Status = ? WHERE car_id = ?";
 
     try (PreparedStatement pstmt = connection.prepareStatement(query)) {
         // Set parameters for the query

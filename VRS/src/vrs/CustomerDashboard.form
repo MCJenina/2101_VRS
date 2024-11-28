@@ -88,9 +88,6 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="Book">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\baldo\Downloads\appointment.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Book Now!  "/>
           </Properties>
           <Events>
@@ -99,9 +96,6 @@
         </Component>
         <Component class="javax.swing.JButton" name="Return">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\baldo\Downloads\return.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Return Now!"/>
           </Properties>
           <Events>
@@ -110,9 +104,6 @@
         </Component>
         <Component class="javax.swing.JButton" name="jButton1">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\baldo\Downloads\power.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="Log Out      "/>
           </Properties>
           <Events>
@@ -185,11 +176,6 @@
               </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel1">
-              <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\baldo\Downloads\customer.png"/>
-                </Property>
-              </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel2">
               <Properties>

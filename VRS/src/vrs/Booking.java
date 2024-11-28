@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 public class Booking extends javax.swing.JFrame {
     private Connection connection;
@@ -18,6 +20,7 @@ public class Booking extends javax.swing.JFrame {
 
         // Attach the action listener to the JComboBox
         places.addActionListener(evt -> placesActionPerformed(evt));//whenever a user selects a place from the JComboBox, the placesActionPerformed method runs, updating the additional fees
+        AdditionalFee.addActionListener(evt -> placesActionPerformed(evt));
         // Load available cars
         
         //in here when the customer select car in the table it will show in the JTextField in the right side labeled Selected cars
@@ -32,9 +35,14 @@ public class Booking extends javax.swing.JFrame {
 
         // Retrieve the value of the "Model" column (column index 1)
         String carModel = Bookingtable.getValueAt(selectedRow, 1).toString();
+        String priceText = Bookingtable.getValueAt(selectedRow, 4).toString();
+        
+        
 
         // Set the car model into the CarsGalingTable JTextField
         CarsGalingTable.setText(carModel);
+        price.setText(priceText);
+        
         }
     });
         
@@ -145,6 +153,8 @@ public class Booking extends javax.swing.JFrame {
         gcash = new javax.swing.JRadioButton();
         CarsGalingTable = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
+        pickUPDate = new com.toedter.calendar.JDateChooser();
+        price = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(130, 70, 52));
@@ -327,9 +337,7 @@ public class Booking extends javax.swing.JFrame {
             .addGroup(BookingFillUpLayout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(BookingFillUpLayout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel10)
                     .addGroup(BookingFillUpLayout.createSequentialGroup()
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(CarsGalingTable)
@@ -339,15 +347,21 @@ public class Booking extends javax.swing.JFrame {
                             .addComponent(jLabel5)
                             .addComponent(jLabel8)
                             .addComponent(jLabel9))
-                        .addGap(46, 46, 46)
                         .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel11)
                             .addGroup(BookingFillUpLayout.createSequentialGroup()
-                                .addComponent(cash)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(gcash)))
-                        .addContainerGap(90, Short.MAX_VALUE))))
+                                .addGap(46, 46, 46)
+                                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel11)
+                                    .addGroup(BookingFillUpLayout.createSequentialGroup()
+                                        .addComponent(cash)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(gcash))
+                                    .addComponent(pickUPDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BookingFillUpLayout.createSequentialGroup()
+                                .addGap(33, 33, 33)
+                                .addComponent(price, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(90, Short.MAX_VALUE))
             .addGroup(BookingFillUpLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(print)
@@ -359,32 +373,37 @@ public class Booking extends javax.swing.JFrame {
                 .addGap(35, 35, 35)
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(CarsGalingTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CarsGalingTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                .addComponent(places, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(BookingFillUpLayout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jLabel8)
+                        .addComponent(places, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(BookingFillUpLayout.createSequentialGroup()
+                                .addGap(22, 22, 22)
+                                .addComponent(jLabel8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(Destination, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(BookingFillUpLayout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addComponent(jLabel11)
+                                .addGap(18, 18, 18)
+                                .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(cash)
+                                    .addComponent(gcash))))
+                        .addGap(4, 4, 4)
+                        .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(Destination, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(BookingFillUpLayout.createSequentialGroup()
-                        .addGap(37, 37, 37)
-                        .addComponent(jLabel11)
-                        .addGap(18, 18, 18)
-                        .addGroup(BookingFillUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cash)
-                            .addComponent(gcash))))
-                .addGap(4, 4, 4)
-                .addComponent(jLabel9)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(AdditionalFee, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(79, 79, 79)
-                .addComponent(print)
+                        .addComponent(AdditionalFee, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(79, 79, 79)
+                        .addComponent(print))
+                    .addComponent(pickUPDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(16, 16, 16))
         );
 
@@ -416,106 +435,161 @@ public class Booking extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BOOK1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BOOK1ActionPerformed
-     // Step 1: Check if a car is selected from the table
+     // Validate required input fields
+    String customerName = CarsGalingTable.getText().trim();
+    String licenseNumber = Destination.getText().trim();
+    String address = AdditionalFee.getText().trim();
+
+    // Get payment method from ButtonGroup
+    String paymentMethod = "";
+    if (cash.isSelected()) {
+        paymentMethod = "Cash";
+    } else if (gcash.isSelected()) {
+        paymentMethod = "GCash";
+    }
+
+    // Ensure a payment method is selected
+    if (paymentMethod.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please select a payment method.");
+        return;  // Exit if no payment method is selected
+    }
+
+    // Validate pickup date
+     java.util.Date utilDate = pickUPDate.getDate();  // Get the selected date from JDateChooser
+    if (utilDate == null) {
+        JOptionPane.showMessageDialog(this, "Please select a pickup date.");
+        return;  // Exit if no pickup date is selected
+    }
+
+    // Validate required fields
+    if (customerName.isEmpty() || licenseNumber.isEmpty() || address.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please fill in all required fields: Name, License, and Address.");
+        return;  // Exit if any field is empty
+    }
+
+    // Check if a car is selected
     int selectedRow = Bookingtable.getSelectedRow();
     if (selectedRow == -1) {
         JOptionPane.showMessageDialog(this, "Please select a car to book.");
         return;  // Exit if no car is selected
     }
 
-    // Step 2: Get the car ID from the selected row
-    int carId = (int) Bookingtable.getValueAt(selectedRow, 0); // Assuming first column is car ID
-    int customerId = SessionManager.getCustomerId();  // Retrieve current logged-in customer ID
+    // Get the car ID from the selected row
+    int carId = (int) Bookingtable.getValueAt(selectedRow, 0);  // Assuming the first column is the car ID
+    int customerId = SessionManager.getCustomerId();  // Retrieve the current logged-in customer ID
 
-    // Proceed to book the car
-    bookCar(customerId, carId);
+    // Confirm booking
+    int confirmation = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to book this car?",
+        "Confirm Booking",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE
+    );
+
+    if (confirmation == JOptionPane.YES_OPTION) {
+        bookCar(customerId, carId, paymentMethod, licenseNumber, address);
+    } else {
+        JOptionPane.showMessageDialog(this, "Booking cancelled.");
+    }
 }
-private void bookCar(int customerId, int carId) {
-    // Queries
+
+private void bookCar(int customerId, int carId, String paymentMethod, String place, String additionalFeeText) {
     String checkUserQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
     String checkActiveBookingQuery = "SELECT COUNT(*) FROM booking WHERE user_id = ? AND status = 'active'";
-    String insertQuery = "INSERT INTO booking (user_id, car_id, booking_date, status) VALUES (?, ?, NOW(), 'active')";
+    String insertQuery = "INSERT INTO booking (user_id, car_id, booking_date, status, payment_method, place, additional_fee, vehicle_price, total_price) VALUES (?, ?, NOW(), 'active', ?, ?, ?, ?, ?)";
     String updateCarQuery = "UPDATE cars SET status = 'Booked' WHERE car_id = ?";
-    String getBookingIdQuery = "SELECT booking_id FROM booking WHERE user_id = ? AND car_id = ? AND status = 'active' ORDER BY booking_date DESC LIMIT 1";
+    String getVehiclePriceQuery = "SELECT price FROM cars WHERE car_id = ?";
+    double additionalFee = 0.0;
+
+    // Parse the additional fee
+    try {
+        additionalFee = Double.parseDouble(additionalFeeText);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Invalid additional fee amount.");
+        return;
+    }
+
+    // Retrieve the vehicle price
+    double vehiclePrice = 0.0;
+    try (PreparedStatement getVehiclePriceStmt = connection.prepareStatement(getVehiclePriceQuery)) {
+        getVehiclePriceStmt.setInt(1, carId);
+        ResultSet rsVehiclePrice = getVehiclePriceStmt.executeQuery();
+        if (rsVehiclePrice.next()) {
+            vehiclePrice = rsVehiclePrice.getDouble("price");
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error retrieving vehicle price: " + e.getMessage());
+        e.printStackTrace();
+        return;
+    }
+
+    double totalPrice = vehiclePrice + additionalFee;
 
     try {
-        // Begin transaction
         connection.setAutoCommit(false);
 
-        // Step 1: Check if the user exists
+        // Check user existence
         try (PreparedStatement checkUserStmt = connection.prepareStatement(checkUserQuery)) {
             checkUserStmt.setInt(1, customerId);
             ResultSet rsUser = checkUserStmt.executeQuery();
-
             if (rsUser.next() && rsUser.getInt(1) == 0) {
                 JOptionPane.showMessageDialog(this, "Customer does not exist.");
                 return;
             }
         }
 
-        // Step 2: Check for active booking
+        // Check active bookings
         try (PreparedStatement checkBookingStmt = connection.prepareStatement(checkActiveBookingQuery)) {
             checkBookingStmt.setInt(1, customerId);
             ResultSet rsBooking = checkBookingStmt.executeQuery();
-
             if (rsBooking.next() && rsBooking.getInt(1) > 0) {
-                JOptionPane.showMessageDialog(this, "You already have an active booking. Please return the vehicle first.");
+                JOptionPane.showMessageDialog(this, "You already have an active booking.");
                 return;
             }
         }
 
-        // Step 3: Insert new booking
+        // Insert booking
         try (PreparedStatement insertBookingStmt = connection.prepareStatement(insertQuery)) {
             insertBookingStmt.setInt(1, customerId);
             insertBookingStmt.setInt(2, carId);
+            insertBookingStmt.setString(3, paymentMethod);
+            insertBookingStmt.setString(4, place);
+            insertBookingStmt.setDouble(5, additionalFee);
+            insertBookingStmt.setDouble(6, vehiclePrice);
+            insertBookingStmt.setDouble(7, totalPrice);
 
-            int rowsAffected = insertBookingStmt.executeUpdate();
-            if (rowsAffected > 0) {
+            int rows = insertBookingStmt.executeUpdate();
+            if (rows > 0) {
                 JOptionPane.showMessageDialog(this, "Booking successful!");
             }
         }
 
-        // Step 4: Update car status
+        // Update car status
         try (PreparedStatement updateCarStmt = connection.prepareStatement(updateCarQuery)) {
             updateCarStmt.setInt(1, carId);
             updateCarStmt.executeUpdate();
         }
 
-        // Commit the transaction
         connection.commit();
-
-        // Step 5: Retrieve and display booking ID
-        try (PreparedStatement getBookingIdStmt = connection.prepareStatement(getBookingIdQuery)) {
-            getBookingIdStmt.setInt(1, customerId);
-            getBookingIdStmt.setInt(2, carId);
-            ResultSet rsBookingId = getBookingIdStmt.executeQuery();
-
-            if (rsBookingId.next()) {
-                int bookingId = rsBookingId.getInt("booking_id");
-                JOptionPane.showMessageDialog(this, "Booking ID: " + bookingId);
-            }
-        }
-
-        // Refresh available cars
         loadAvailableCars();
 
     } catch (SQLException e) {
-        // Rollback in case of errors
         try {
             connection.rollback();
         } catch (SQLException rollbackEx) {
             rollbackEx.printStackTrace();
         }
-        JOptionPane.showMessageDialog(this, "Error booking car: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Booking failed: " + e.getMessage());
         e.printStackTrace();
     } finally {
-        // Restore auto-commit mode
         try {
             connection.setAutoCommit(true);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
+
 
     }//GEN-LAST:event_BOOK1ActionPerformed
 
@@ -540,25 +614,84 @@ private void bookCar(int customerId, int carId) {
     }//GEN-LAST:event_placesActionPerformed
 
     private void printActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printActionPerformed
-        // TODO add your handling code here:
-        // Create a string representing the receipt
-        String receipt = "------------------ Payment Receipt ------------------\n"
-        //+ "Car Id/Name: " + car_id.getText()+ "\n"
-        + "Destination: " + places.getSelectedItem() + "\n"
-        //+ "Pick-Up Date: " + pickupDateChooser.getDate() + "\n"
-        + "----------------------------------------------------";
+     // Initialize variables for customer name, total price, payment method, and car model
+    String customerName = "";
+    double totalPrice = 0.0;
+    String paymentMethod = "";
+    String carModel = "";  // To store the car model name
 
-        // Use the Java Print API
-        try {
-            boolean complete = new javax.swing.JTextArea(receipt).print();
-            if (complete) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Receipt printed successfully.");
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Printing was canceled.");
-            }
-        } catch (java.awt.print.PrinterException ex) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
-        }
+    // Assuming carModel is a string from the UI or another source
+    carModel = CarsGalingTable.getText().trim(); // Get car model input as string
+
+// SQL query to get customer name, total price, payment method, and car model
+String query = "SELECT u.name, b.total_price, b.payment_method, c.model " +
+               "FROM users u " +
+               "JOIN booking b ON u.id = b.user_id " +
+               "JOIN cars c ON b.car_id = c.car_id " + // Join with correct column names
+               "WHERE c.model = ?";  // Use car model in the WHERE clause
+
+try (PreparedStatement stmt = connection.prepareStatement(query)) {
+    stmt.setString(1, carModel);  // Set the car model parameter
+    ResultSet rs = stmt.executeQuery();
+
+    if (rs.next()) {
+        customerName = rs.getString("name");
+        totalPrice = rs.getDouble("total_price");
+        paymentMethod = rs.getString("payment_method");
+        carModel = rs.getString("model");  // Retrieve car model from result set
+    } else {
+        JOptionPane.showMessageDialog(this, "No booking found for the selected car model.");
+        return;
+    }
+} catch (SQLException e) {
+    JOptionPane.showMessageDialog(this, "Error retrieving data: " + e.getMessage());
+    e.printStackTrace();
+    return;
+}
+
+// Create the formatted receipt
+String receipt = String.format(
+    "--------------------AUTOMOBILIS---------------------\n\n" +
+    "------------------ PAYMENT RECEIPT ------------------\n\n" +
+    "Customer Name: %-30s\n" +
+    "----------------------------------------------------\n" +
+    "Car Model: %-30s\n" +  // Display car model here
+    "Destination: %-30s\n" +
+    "Pick-Up Date: %-20s\n" +
+    "----------------------------------------------------\n" +
+    "Car Price: PHP %-10s\n" +
+    "Additional Fee: PHP %-10s\n" +
+    "Total Price: PHP %-10.2f\n" +
+    "Payment Method: %-20s\n" +
+    "----------------------------------------------------\n" +
+    "Thank you for booking with us! Have a safe journey.\n" +
+    "----------------------------------------------------",
+    customerName,         // Customer name
+    carModel,             // Car model
+    places.getSelectedItem(),  // Destination (ComboBox)
+    new SimpleDateFormat("yyyy-MM-dd").format(pickUPDate.getDate()), // Pick-Up Date
+    price.getText(),
+    AdditionalFee.getText(), // Additional Fee
+    totalPrice,           // Total Price
+    paymentMethod         // Payment Method
+);
+
+// Create a JTextArea to display the receipt
+JTextArea textArea = new JTextArea();
+textArea.setText(receipt);
+textArea.setEditable(false);  // Make it non-editable
+
+// Use the Java Print API to print the content of JTextArea
+try {
+    boolean complete = textArea.print();
+    if (complete) {
+        JOptionPane.showMessageDialog(this, "Receipt printed successfully.");
+    } else {
+        JOptionPane.showMessageDialog(this, "Printing was canceled.");
+    }
+} catch (java.awt.print.PrinterException ex) {
+    JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+}
     }//GEN-LAST:event_printActionPerformed
 
     private void cashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cashActionPerformed
@@ -646,7 +779,9 @@ private void bookCar(int customerId, int carId) {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private com.toedter.calendar.JDateChooser pickUPDate;
     private javax.swing.JComboBox<String> places;
+    private javax.swing.JTextField price;
     private javax.swing.JButton print;
     // End of variables declaration//GEN-END:variables
 }

@@ -45,8 +45,6 @@ public class Admin_DashBoard extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Mongolian Baiti", 1, 46)); // NOI18N
         jLabel1.setText("AutoMoBilis");
 
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\baldo\\Downloads\\administrator (1).png")); // NOI18N
-
         jLabel4.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         jLabel4.setText("Admin Dashboard");
 
@@ -74,10 +72,9 @@ public class Admin_DashBoard extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        customerButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\baldo\\Downloads\\customer (1).png")); // NOI18N
         customerButton.setText("Manage Customers");
         customerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -85,7 +82,6 @@ public class Admin_DashBoard extends javax.swing.JFrame {
             }
         });
 
-        carButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\baldo\\Downloads\\car.png")); // NOI18N
         carButton.setText("  Manage Cars          ");
         carButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -93,7 +89,6 @@ public class Admin_DashBoard extends javax.swing.JFrame {
             }
         });
 
-        logoutButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\baldo\\Downloads\\power.png")); // NOI18N
         logoutButton.setText("Log out                 ");
         logoutButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -127,13 +122,13 @@ public class Admin_DashBoard extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(92, 92, 92)
+                .addGap(47, 47, 47)
                 .addComponent(customerButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(33, 33, 33)
+                .addGap(31, 31, 31)
                 .addComponent(carButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
                 .addComponent(logoutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addContainerGap())
         );
