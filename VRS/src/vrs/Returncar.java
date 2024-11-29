@@ -21,6 +21,7 @@ import vrs.SessionManager;
        this.loggedInUserId = SessionManager.getCustomerId(); // Get user ID from Session Manager
         System.out.println("Logged In User ID: " + loggedInUserId); // Debugging line to check user ID
         initComponents();
+        this.setLocationRelativeTo(null);
         this.setTitle("Return Car");
         connectDatabase();
         loadActiveBookings();
@@ -232,7 +233,56 @@ private int getCarIdFromBooking(int bookingId) {
     }
     return carId;
 }
+// Method to mark vehicle as under maintenance
+private void markVehicleAsUnderMaintenance(int carId) throws SQLException {
+    // Ensure the connection is valid
+    if (connection == null || connection.isClosed()) {
+        connection = connectDatabase(); // Reconnect if necessary
+    }
 
+    // Update query to mark the vehicle as under maintenance
+    String updateQuery = "UPDATE cars SET status = 'Under Maintenance' WHERE car_id = ?";
+
+    try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+        preparedStatement.setInt(1, carId); // Set the carId (vehicle ID) in the query
+        
+        // Execute the update query
+        int rowsAffected = preparedStatement.executeUpdate();
+        
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(this, "Vehicle marked as under maintenance successfully!");
+        } else {
+            JOptionPane.showMessageDialog(this, "No such vehicle found.");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error updating vehicle status: " + e.getMessage());
+    }
+}
+
+// Method to return vehicle and check for damage
+private void returnVehicleAndCheckDamage() throws SQLException {
+    int selectedRow = ReturnCarsTable.getSelectedRow();
+
+    if (selectedRow >= 0) {
+        // Get the booking details
+        int bookingId = (int) ReturnCarsTable.getValueAt(selectedRow, 0);
+        int carId = (int) ReturnCarsTable.getValueAt(selectedRow, 1); // Get the carId from the table
+
+        // Check if the damage checkbox is selected
+        boolean isDamageSelected = damageCheckbox.isSelected();
+
+        // If damage is selected, mark the vehicle as under maintenance
+        if (isDamageSelected) {
+            markVehicleAsUnderMaintenance(carId);
+        }
+
+        // Additional logic for returning the vehicle
+        // Process the return, calculate late fees, etc.
+    } else {
+        JOptionPane.showMessageDialog(this, "Please select a booking to return.");
+    }
+}
 
 
 
@@ -251,7 +301,7 @@ private int getCarIdFromBooking(int bookingId) {
         damageCheckbox = new javax.swing.JCheckBox();
         bookingDateTextField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        Print = new javax.swing.JButton();
         returnDateChooser = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -307,10 +357,10 @@ private int getCarIdFromBooking(int bookingId) {
 
         jLabel3.setText("Booking Date: ");
 
-        jButton1.setText("Print Receipt");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        Print.setText("Print Receipt");
+        Print.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                PrintActionPerformed(evt);
             }
         });
 
@@ -338,7 +388,7 @@ private int getCarIdFromBooking(int bookingId) {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(damageCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(bookingDateTextField, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton1)
+                            .addComponent(Print)
                             .addComponent(returnDateChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap(163, Short.MAX_VALUE))))
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -373,7 +423,7 @@ private int getCarIdFromBooking(int bookingId) {
                         .addGap(14, 14, 14)
                         .addComponent(damageCheckbox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1)
+                        .addComponent(Print)
                         .addGap(13, 13, 13))))
         );
 
@@ -393,73 +443,82 @@ private int getCarIdFromBooking(int bookingId) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ReturnjButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReturnjButton1ActionPerformed
-    // Get the selected booking from the table
-    int selectedRow = ReturnCarsTable.getSelectedRow();
+// Get the selected booking from the table
+int selectedRow = ReturnCarsTable.getSelectedRow();
 
-    // Check if a booking is selected
-    if (selectedRow >= 0) {
-        // Get the booking details
-        int bookingId = (int) ReturnCarsTable.getValueAt(selectedRow, 0);
-        Date bookingReturnDate = (Date) ReturnCarsTable.getValueAt(selectedRow, 2); // Get the booking's expected return date
-        
-        // Check if bookingReturnDate is null and handle appropriately
-        if (bookingReturnDate != null) {
-            // Set the booking return date in the text field (assuming it's a JTextField)
-            bookingDateTextField.setText(bookingReturnDate.toString());  // Display the date in the TextField
-        } else {
-            JOptionPane.showMessageDialog(this, "No return date available for this booking.");
-            return;  // Exit if no return date is available
-        }
+// Check if a booking is selected
+if (selectedRow >= 0) {
+    // Get the booking details
+    int bookingId = (int) ReturnCarsTable.getValueAt(selectedRow, 0);
+    Date bookingReturnDate = (Date) ReturnCarsTable.getValueAt(selectedRow, 2); // Get the booking's expected return date
+    
+    // Check if bookingReturnDate is null and handle appropriately
+    if (bookingReturnDate != null) {
+        // Set the booking return date in the text field (assuming it's a JTextField)
+        bookingDateTextField.setText(bookingReturnDate.toString());  // Display the date in the TextField
+    } else {
+        JOptionPane.showMessageDialog(this, "No return date available for this booking.");
+        return;  // Exit if no return date is available
+    }
 
-        // Get the return date selected by the user (from JDateChooser or similar component)
-        java.util.Date userReturnDate = returnDateChooser.getDate();  // Get the selected date from JDateChooser
+    // Get the return date selected by the user (from JDateChooser or similar component)
+    java.util.Date userReturnDate = returnDateChooser.getDate();  // Get the selected date from JDateChooser
 
-        // Check if the user has selected a return date
-        if (userReturnDate == null) {
-            JOptionPane.showMessageDialog(this, "Please select a return date.");
-            return;  // Exit if no date is selected
-        }
+    // Check if the user has selected a return date
+    if (userReturnDate == null) {
+        JOptionPane.showMessageDialog(this, "Please select a return date.");
+        return;  // Exit if no date is selected
+    }
 
-        // Convert java.util.Date to LocalDate
-        LocalDate localUserReturnDate = userReturnDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    // Convert java.util.Date to LocalDate
+    LocalDate localUserReturnDate = userReturnDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        // Convert the booking's return date (java.sql.Date) to LocalDate, with a null check
-        if (bookingReturnDate != null) {
-            LocalDate localBookingReturnDate = bookingReturnDate.toLocalDate();
+    // Convert the booking's return date (java.sql.Date) to LocalDate, with a null check
+    if (bookingReturnDate != null) {
+        LocalDate localBookingReturnDate = bookingReturnDate.toLocalDate();
 
-            // Calculate late fee if necessary
-            long lateFee = calculateLateFee(localBookingReturnDate, localUserReturnDate);
+        // Calculate late fee if necessary
+        long lateFee = calculateLateFee(localBookingReturnDate, localUserReturnDate);
 
-            // Check if the damage checkbox is selected and calculate damage fee
-            long damageFee = 0;
-            if (damageCheckbox.isSelected()) {
-                damageFee = 500; // Assuming damage fee is a fixed amount, you can adjust this
+        // Retrieve car_id from the database using bookingId
+        int carId = getCarIdFromBooking(bookingId);
+
+        // Check if the damage checkbox is selected and calculate damage fee only if it is
+        long damageFee = 0;
+        if (damageCheckbox.isSelected()) {
+            damageFee = 500; // Assuming damage fee is a fixed amount
+            try {
+                // Mark the vehicle as "under maintenance" in the database to prevent new bookings
+                markVehicleAsUnderMaintenance(carId);
+            } catch (SQLException ex) {
+                Logger.getLogger(Returncar.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            // Retrieve car_id from the database using bookingId
-            int carId = getCarIdFromBooking(bookingId);
+            JOptionPane.showMessageDialog(this, "Vehicle is under maintenance due to damage. It cannot be booked by other customers until repaired.");
+        }
 
-            // Now, insert the return data into the returns table
-            boolean isReturnSuccessful = returnVehicle(carId, bookingId, localUserReturnDate, lateFee, damageFee);
+        // Now, insert the return data into the returns table
+        boolean isReturnSuccessful = returnVehicle(carId, bookingId, localUserReturnDate, lateFee, damageFee);
 
-            if (isReturnSuccessful) {
-                // After returning, update the booking status to "returned"
-                updateBookingStatus(bookingId);
+        if (isReturnSuccessful) {
+            // After returning, update the booking status to "returned"
+            updateBookingStatus(bookingId);
 
-                // After returning, remove the row from the table
-                DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
-                model.removeRow(selectedRow);
+            // After returning, remove the row from the table
+            DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
+            model.removeRow(selectedRow);
 
-                JOptionPane.showMessageDialog(this, "Vehicle returned successfully!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Return failed. Please check your return details.");
-            }
+            JOptionPane.showMessageDialog(this, "Vehicle returned successfully!");
         } else {
-            JOptionPane.showMessageDialog(this, "Booking return date is missing.");
+            JOptionPane.showMessageDialog(this, "Return failed. Please check your return details.");
         }
     } else {
-        JOptionPane.showMessageDialog(this, "Please select a booking to return.");
+        JOptionPane.showMessageDialog(this, "Booking return date is missing.");
     }
+} else {
+    JOptionPane.showMessageDialog(this, "Please select a booking to return.");
+}
+
         }//GEN-LAST:event_ReturnjButton1ActionPerformed
 
     private void CanceljButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CanceljButton2ActionPerformed
@@ -474,29 +533,32 @@ private int getCarIdFromBooking(int bookingId) {
 
     }//GEN-LAST:event_damageCheckboxActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-                                      
-
-    // TODO add your handling code here:
-    // Retrieve selected row from the table
+    private void PrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PrintActionPerformed
+       // Retrieve the selected row from the table
     int selectedRow = ReturnCarsTable.getSelectedRow();
     if (selectedRow != -1) {
         // Get booking details from the table model
         DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
-        int bookingId = (int) model.getValueAt(selectedRow, 0); // Assuming bookingId is in column 0
-        String carModel = (String) model.getValueAt(selectedRow, 1); // Assuming carModel is in column 1
-        Date bookingDate = (Date) model.getValueAt(selectedRow, 2); // Assuming bookingDate is in column 2
+        
+        // Assuming the columns are: Booking ID, Car Model, Booking Date
+        int bookingId = (int) model.getValueAt(selectedRow, 0); // Booking ID in column 0
+        String carModel = (String) model.getValueAt(selectedRow, 1); // Car Model in column 1
+        Date bookingDate = (Date) model.getValueAt(selectedRow, 2); // Booking Date in column 2
 
-        // Assume userReturnDate, lateFee, and damageFee are already calculated
+        // Assume the return date is the current date
         LocalDate userReturnDate = LocalDate.now(); // Example: Set to current date
+        
+        // Calculate the late fee
         long lateFee = calculateLateFee(bookingDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), userReturnDate);
-        long damageFee = damageCheckbox.isSelected() ? 500 : 0; // Example damage fee logic
+        
+        // Damage fee logic
+        long damageFee = damageCheckbox.isSelected() ? 500 : 0; // Damage fee of PHP 500 if selected
 
         // Create a string representing the receipt
         String receipt = "------------------ Payment Receipt ------------------\n"
                 + "Booking ID: " + bookingId + "\n"
                 + "Car Model: " + carModel + "\n"
-                + "Booking Date: " + bookingDate + "\n"
+                + "Booking Date: " + bookingDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() + "\n"  // Displaying booking date
                 + "Return Date: " + userReturnDate + "\n"
                 + "Late Fee: PHP " + lateFee + "\n"
                 + "Damage Fee: PHP " + damageFee + "\n"
@@ -506,21 +568,25 @@ private int getCarIdFromBooking(int bookingId) {
         JTextArea textArea = new JTextArea();
         textArea.setText(receipt);
         textArea.setEditable(false);
-
-        // Use the Java Print API
+        
+        // Use the Java Print API to print the receipt
         boolean complete = false;
         try {
             complete = textArea.print();
         } catch (PrinterException ex) {
-            Logger.getLogger(Returncar.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Returncar.class.getName()).log(Level.SEVERE, "Printing error", ex);
         }
+        
         if (complete) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Receipt printed successfully.");
+            JOptionPane.showMessageDialog(this, "Receipt printed successfully.");
         } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Printing was canceled.");
+            JOptionPane.showMessageDialog(this, "Printing was canceled.");
         }
+    } else {
+        // Display a message if no row is selected
+        JOptionPane.showMessageDialog(this, "Please select a booking to print.");
     
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_PrintActionPerformed
     }
     /**
      * @param args the command line arguments
@@ -561,11 +627,11 @@ private int getCarIdFromBooking(int bookingId) {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CanceljButton2;
+    private javax.swing.JButton Print;
     private javax.swing.JTable ReturnCarsTable;
     private javax.swing.JButton ReturnjButton1;
     private javax.swing.JTextField bookingDateTextField;
     private javax.swing.JCheckBox damageCheckbox;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

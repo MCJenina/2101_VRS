@@ -10,6 +10,7 @@ public class Car extends javax.swing.JFrame {
     // Constructor
     public Car() {
         initComponents(); 
+        this.setLocationRelativeTo(null);
         connectDatabase(); 
         loadCarDetails();  
     }
@@ -151,9 +152,6 @@ public class Car extends javax.swing.JFrame {
         }
     }
 
-    
-
-
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -184,11 +182,17 @@ public class Car extends javax.swing.JFrame {
         backButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
 
         jPanel1.setBackground(new java.awt.Color(255, 200, 105));
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI Black", 0, 20)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Segoe UI Black", 1, 24)); // NOI18N
         jLabel3.setText("X");
+        jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel3MouseClicked(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Mongolian Baiti", 1, 18)); // NOI18N
         jLabel1.setText("MANAGE CAR");
@@ -469,6 +473,7 @@ public class Car extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void CarIdTXTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CarIdTXTActionPerformed
@@ -696,6 +701,11 @@ public class Car extends javax.swing.JFrame {
         this.dispose();
 
     }//GEN-LAST:event_backButtonActionPerformed
+
+    private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
+        // TODO add your handling code here:
+        dispose();
+    }//GEN-LAST:event_jLabel3MouseClicked
 
     /**
      * @param args the command line arguments

@@ -25,11 +25,12 @@ public class ManageBooking extends javax.swing.JFrame {
 
     // Creates new form ManageBooking
     public ManageBooking() {
+        
         initComponents();
 
         // Initialize DefaultTableModel for your JTable
         DefaultTableModel model = new DefaultTableModel();
-        managebookingtable.setModel(model);  // Set the model for the JTable
+        manage_booking_table.setModel(model);  // Set the model for the JTable
         model.addColumn("Return Date");
         model.addColumn("User ID");
         model.addColumn("User Name");
@@ -111,13 +112,20 @@ public class ManageBooking extends javax.swing.JFrame {
         Search = new javax.swing.JButton();
         Name = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
 
         Bookpanel.setBackground(new java.awt.Color(255, 200, 105));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI Black", 0, 20)); // NOI18N
         jLabel3.setText("X");
+        jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel3MouseClicked(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Mongolian Baiti", 1, 18)); // NOI18N
         jLabel6.setText("MANAGE BOOKING");
@@ -150,14 +158,17 @@ public class ManageBooking extends javax.swing.JFrame {
 
         jLabel1.setText("Name:");
 
+        jButton1.setText("Back");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout BookpanelLayout = new javax.swing.GroupLayout(Bookpanel);
         Bookpanel.setLayout(BookpanelLayout);
         BookpanelLayout.setHorizontalGroup(
             BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BookpanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(Search, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(73, 73, 73))
             .addGroup(BookpanelLayout.createSequentialGroup()
                 .addGap(17, 17, 17)
                 .addGroup(BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -171,9 +182,15 @@ public class ManageBooking extends javax.swing.JFrame {
                             .addGroup(BookpanelLayout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(Name, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(Name, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(29, 29, 29)
+                                .addComponent(Search, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BookpanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(43, 43, 43))
         );
         BookpanelLayout.setVerticalGroup(
             BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -185,11 +202,12 @@ public class ManageBooking extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(Name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(Name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Search, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(Search, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButton1)
                 .addGap(13, 13, 13))
         );
 
@@ -205,6 +223,7 @@ public class ManageBooking extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void NameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NameActionPerformed
@@ -217,12 +236,24 @@ public class ManageBooking extends javax.swing.JFrame {
         String userName = Name.getText().trim();  // Ensure Name is the correct JTextField name
 
         // Ensure the JTable has a valid model to interact with
-        DefaultTableModel model = (DefaultTableModel) managebookingtable.getModel();  // Make sure managebookingtable is the correct JTable
+        DefaultTableModel model = (DefaultTableModel) manage_booking_table.getModel();  // Make sure managebookingtable is the correct JTable
 
         // Perform search based on user input (filter by userName)
         loadBookingData(model, userName);  // Call loadBookingData with the search input
 
     }//GEN-LAST:event_SearchActionPerformed
+
+    private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
+        // TODO add your handling code here:
+        dispose();
+    }//GEN-LAST:event_jLabel3MouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        CustomerDashboard cb = new CustomerDashboard();
+        cb.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -264,6 +295,7 @@ public class ManageBooking extends javax.swing.JFrame {
     private javax.swing.JPanel Bookpanel;
     private javax.swing.JTextField Name;
     private javax.swing.JButton Search;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel6;

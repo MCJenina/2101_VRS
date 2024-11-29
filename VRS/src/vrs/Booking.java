@@ -14,6 +14,7 @@ public class Booking extends javax.swing.JFrame {
 
     public Booking() {
         initComponents();  // Initialize components (auto-generated in the GUI designer)
+        this.setLocationRelativeTo(null);
         connectDatabase();
         loadAvailableCars(); 
         initializePlaceFees(); // Populate the map with place fees
