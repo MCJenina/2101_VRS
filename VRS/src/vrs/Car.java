@@ -13,26 +13,50 @@ public class Car extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         connectDatabase(); 
         loadCarDetails();  
+        
+        //So if the user want to update or delete, user just select in the table and it will display it the details 
+        CarsTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        @Override
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            int selectedRow = CarsTable.getSelectedRow(); // Get the selected row
+            if (selectedRow != -1) {
+                // Populate text fields with data from the selected row
+                CarIdTXT.setText(CarsTable.getValueAt(selectedRow, 0).toString()); // Car ID
+                plateNumbertxt.setText(CarsTable.getValueAt(selectedRow, 1).toString()); // Plate Number
+                ModelTXT.setText(CarsTable.getValueAt(selectedRow, 2).toString()); // Model
+                capacity.setSelectedItem(CarsTable.getValueAt(selectedRow, 3).toString()); // Capacity (ComboBox)
+                CarTypeTXT.setSelectedItem(CarsTable.getValueAt(selectedRow, 4).toString()); // Type (ComboBox)
+                CarPriceTXT.setText(CarsTable.getValueAt(selectedRow, 5).toString()); // Price
+                //StatusCombo.setSelectedItem(CarsTable.getValueAt(selectedRow, 6).toString()); // Status (ComboBox)
+            }
+        }
+        });
+        
+        
     }
 
     // Method to load car details and update the table
     private void loadCarDetails() {
-    String query = "SELECT car_id, Model, Type, Price, Status FROM cars";
+    String query = "SELECT car_id,plateNumber, Model,Capacity, Type, Price, Status FROM cars";
     try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("Car ID");
+        model.addColumn("Plate Number");
         model.addColumn("Car Model");
+        model.addColumn("Capacity");
         model.addColumn("Type");
         model.addColumn("Price");
         model.addColumn("Status");
 
         while (rs.next()) {
-            Object[] row = new Object[5];
+            Object[] row = new Object[7];
             row[0] = rs.getString("car_id");
-            row[1] = rs.getString("Model");
-            row[2] = rs.getString("Type");
-            row[3] = rs.getDouble("Price");
-            row[4] = rs.getString("Status");
+            row[1] = rs.getString("plateNumber");
+            row[2] = rs.getString("Model");
+            row[3] = rs.getString("Capacity");
+            row[4] = rs.getString("Type");
+            row[5] = rs.getDouble("Price");
+            row[6] = rs.getString("Status");
             model.addRow(row);
         }
 
@@ -85,6 +109,8 @@ public class Car extends javax.swing.JFrame {
         e.printStackTrace();
         JOptionPane.showMessageDialog(this, "Error updating car status: " + e.getMessage());
     }
+    
+    
 }
     // This method will be triggered when a car is booked
     private void handleAutoBooking(String carId) {
@@ -125,16 +151,18 @@ public class Car extends javax.swing.JFrame {
 
 
     // Method to add a new car to the database
-    private void addCarToDatabase(String carId, String Status, double Price, String Model, String Type) {
-        String query = "INSERT INTO cars (car_id, Status, Price, Model, Type) VALUES (?, ?, ?, ?, ?)";
+    private void addCarToDatabase(String carId, String plateNumber, String Status, double Price, String Model,String Capacity, String Type) {
+        String query = "INSERT INTO cars (car_id, Status, Price, Model, Type) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             // Set parameters in the SQL query
             pstmt.setString(1, carId);
-            pstmt.setString(2, Status);
-            pstmt.setDouble(3, Price);
-            pstmt.setString(4, Model);
-            pstmt.setString(5, Type);
+            pstmt.setString(2, plateNumber);
+            pstmt.setString(3, Status);
+            pstmt.setDouble(4, Price);
+            pstmt.setString(5, Model);
+            pstmt.setString(6, Capacity);
+            pstmt.setString(7, Type);
 
             // Execute the insert query
             int rowsAffected = pstmt.executeUpdate();
@@ -151,6 +179,16 @@ public class Car extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
+    public void clearFields(){
+      CarIdTXT.setText(" ");
+      plateNumbertxt.setText(" "); 
+      ModelTXT.setText(" ");
+      capacity.setSelectedIndex(0);
+      CarTypeTXT.setSelectedIndex(0);
+      CarPriceTXT.setText("");
+      
+    }
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -172,7 +210,12 @@ public class Car extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         StatusCombo = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
-        CarTypeTXT = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        plateNumbertxt = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        capacity = new javax.swing.JComboBox<>();
+        CarTypeTXT = new javax.swing.JComboBox<>();
+        CLEAR = new javax.swing.JButton();
         ADDbutton = new javax.swing.JButton();
         DELButton = new javax.swing.JButton();
         UPButton = new javax.swing.JButton();
@@ -222,61 +265,68 @@ public class Car extends javax.swing.JFrame {
         CarsTable.setBackground(new java.awt.Color(255, 255, 204));
         CarsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Car ID", "MODEL", "PRICE", "STATUS"
+                "Car ID", "PLATE NUMBER", "MODEL", "CAPACITY", "TYPE", "PRICE", "STATUS"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Double.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.Double.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
         CarsTable.setColumnSelectionAllowed(true);
         jScrollPane1.setViewportView(CarsTable);
+        CarsTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
         jLabel8.setFont(new java.awt.Font("Rockwell", 0, 14)); // NOI18N
         jLabel8.setText("VEHICLE LIST");
 
         jPanel2.setBackground(new java.awt.Color(244, 244, 244));
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "AutoMoBilis", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Rockwell", 0, 12))); // NOI18N
-        jPanel2.setForeground(new java.awt.Color(255, 255, 255));
 
         CarIdTXT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -290,13 +340,13 @@ public class Car extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setText("Type");
+        jLabel2.setText("Type:");
 
-        jLabel4.setText("MODEL");
+        jLabel4.setText("Model:");
 
-        jLabel5.setText("PRICE");
+        jLabel5.setText("Price:");
 
-        jLabel6.setText("STATUS");
+        jLabel6.setText("Status:");
 
         StatusCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "AVAILABLE", "NOT AVAILABLE", "UNDER MAINTENANCE" }));
         StatusCombo.addActionListener(new java.awt.event.ActionListener() {
@@ -305,56 +355,97 @@ public class Car extends javax.swing.JFrame {
             }
         });
 
-        jLabel9.setText("ID");
+        jLabel9.setText("ID:");
+
+        jLabel10.setText("Plate Number:");
+
+        jLabel11.setText("Capacity:");
+
+        capacity.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2 Seaters", "5 Seaters", "8 Seaters" }));
+
+        CarTypeTXT.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2 Wheels", "4 Wheels" }));
+
+        CLEAR.setText("CLEAR");
+        CLEAR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CLEARActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel9))
-                .addGap(42, 42, 42)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(CarIdTXT, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
-                    .addComponent(ModelTXT, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
-                    .addComponent(CarPriceTXT)
-                    .addComponent(StatusCombo, 0, 1, Short.MAX_VALUE)
-                    .addComponent(CarTypeTXT))
-                .addContainerGap(56, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(capacity, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(CarPriceTXT)
+                            .addComponent(StatusCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel10))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(CarIdTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(plateNumbertxt, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(CLEAR))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(ModelTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(CarTypeTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 20, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(22, Short.MAX_VALUE)
+                .addContainerGap(28, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(CarIdTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9))
-                .addGap(18, 18, 18)
+                    .addComponent(jLabel9)
+                    .addComponent(CarIdTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(CarTypeTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(plateNumbertxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(StatusCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(24, 24, 24))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(ModelTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(CarPriceTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5))
-                        .addGap(61, 61, 61))))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(ModelTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CarTypeTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(capacity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel11))
+                .addGap(16, 16, 16)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CarPriceTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(StatusCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(7, 7, 7)
+                .addComponent(CLEAR))
         );
 
         ADDbutton.setText("ADD");
@@ -426,21 +517,23 @@ public class Car extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(15, 15, 15)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(39, 39, 39)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(UPButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ADDbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(33, 33, 33)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(UPButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(REFButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(REFButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(ADDbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(44, 44, 44)
-                                .addComponent(DELButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGap(56, 56, 56)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
+                                .addComponent(DELButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(56, 56, 56)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 726, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -459,11 +552,14 @@ public class Car extends javax.swing.JFrame {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(ADDbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(DELButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(8, 8, 8)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addComponent(ADDbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(DELButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(UPButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(REFButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))))
@@ -510,8 +606,10 @@ public class Car extends javax.swing.JFrame {
 
     private void ADDbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ADDbuttonActionPerformed
         String carId = CarIdTXT.getText().trim();
+        String plateNumber = plateNumbertxt.getText();
         String carModel = ModelTXT.getText().trim();
-        String carType = CarTypeTXT.getText().trim();
+        String Capacity = capacity.getSelectedItem().toString();
+        String carType = CarTypeTXT.getSelectedItem().toString();
         String priceText = CarPriceTXT.getText().trim();
         String status = (String) StatusCombo.getSelectedItem();
 
@@ -520,6 +618,25 @@ public class Car extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Please fill in all the fields.");
             return;
         }
+    
+        // Check if the plate number already exists for another car
+        String checkQuery = "SELECT COUNT(*) FROM cars WHERE plateNumber = ? AND car_id != ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(checkQuery)) {
+         pstmt.setString(1, plateNumber);
+            pstmt.setString(2, carId);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                JOptionPane.showMessageDialog(this, "Plate number already exists. Please enter a unique plate number.");
+                   return;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error checking plate number: " + ex.getMessage());
+            return;
+        }
+
+        
 
         // Validate that the price input is a valid number
         double price;
@@ -545,21 +662,24 @@ public class Car extends javax.swing.JFrame {
 
         if (confirm == JOptionPane.YES_OPTION) {
             // SQL query to insert the new car into the database
-            String query = "INSERT INTO cars (car_id, Model, Type, Price, Status) VALUES (?, ?, ?, ?, ?)";
+            String query = "INSERT INTO cars (car_id, plateNumber, Model, Capacity , Type, Price, Status) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement pstmt = connection.prepareStatement(query)) {
                 // Set the query parameters
                 pstmt.setString(1, carId);
-                pstmt.setString(2, carModel);
-                pstmt.setString(3, carType);
-                pstmt.setDouble(4, price);
-                pstmt.setString(5, status);
+                pstmt.setString(2, plateNumber);
+                pstmt.setString(3, carModel);
+                pstmt.setString(4, Capacity);
+                pstmt.setString(5, carType);
+                pstmt.setDouble(6, price);
+                pstmt.setString(7, status);
 
                 // Execute the query
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
                     JOptionPane.showMessageDialog(this, "Car added successfully!");
                     loadCarDetails(); // Refresh the list after adding
+                   
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to add the car. Please try again.");
                 }
@@ -571,7 +691,7 @@ public class Car extends javax.swing.JFrame {
             // Clear the input fields
             CarIdTXT.setText("");
             ModelTXT.setText("");
-            CarTypeTXT.setText("");
+           
             CarPriceTXT.setText("");
             StatusCombo.setSelectedIndex(0);
         } else {
@@ -580,68 +700,127 @@ public class Car extends javax.swing.JFrame {
     }//GEN-LAST:event_ADDbuttonActionPerformed
 
     private void DELButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DELButtonActionPerformed
-         // Retrieve the Car ID from the text field
-        String carID = CarIdTXT.getText().trim();
+    // Retrieve the selected row
+    int selectedRow = CarsTable.getSelectedRow();
 
-        // Ensure the Car ID is not empty
-        if (carID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a Car ID.");
-            return;
-        }
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Please select a car from the table to delete.");
+        return;
+    }
 
-        // Show confirmation dialog before proceeding
-        int confirm = JOptionPane.showConfirmDialog(
-            this,
-            "Are you sure you want to delete the car with ID: " + carID + "?",
-            "Confirm Delete",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE
-        );
+    // Retrieve the Car ID from the table
+    String carID = CarsTable.getValueAt(selectedRow, 0).toString();
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            // SQL query to delete the car with the specified Car ID
-            String query = "DELETE FROM cars WHERE car_id = ?";
+    // Show confirmation dialog
+    int confirm = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to delete the car with ID: " + carID + "?",
+        "Confirm Delete",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE
+    );
 
-            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-                // Set the Car ID parameter in the SQL query
-                pstmt.setString(1, carID);
+    if (confirm == JOptionPane.YES_OPTION) {
+        String query = "DELETE FROM cars WHERE car_id = ?";
 
-                // Execute the deletion
-                int rowsAffected = pstmt.executeUpdate();
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, carID);
+            int rowsAffected = pstmt.executeUpdate();
 
-                // Check if any rows were affected (i.e., if a car was deleted)
-                if (rowsAffected > 0) {
-                    JOptionPane.showMessageDialog(this, "Car deleted successfully.");
-                    loadCarDetails();  // Refresh the table after deleting
-                } else {
-                    JOptionPane.showMessageDialog(this, "Car ID not found.");
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();  // Print the exception for debugging purposes
-                JOptionPane.showMessageDialog(this, "Failed to delete car: " + ex.getMessage());
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Car deleted successfully.");
+                loadCarDetails(); // Refresh the table
+                clearFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "Deletion failed. Car ID not found.");
             }
-        } else {
-            // If the user cancels the delete operation
-            JOptionPane.showMessageDialog(this, "Delete operation canceled.");
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error deleting car: " + ex.getMessage());
         }
+    } else {
+        JOptionPane.showMessageDialog(this, "Delete operation canceled.");
+    }
 
     }//GEN-LAST:event_DELButtonActionPerformed
 
     private void UPButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UPButtonActionPerformed
-         // Collect input from text fields and combo box
-    String carID = CarIdTXT.getText();
-    String model = ModelTXT.getText();
-    String carType = CarTypeTXT.getText();
-    String price = CarPriceTXT.getText();
-    String status = (String) StatusCombo.getSelectedItem();
+    // Add a MouseListener to the table
+     
+        
+
+// Collect input from text fields and combo box
+
+    
+        String carId = CarIdTXT.getText().trim();
+        String plateNumber = plateNumbertxt.getText();
+        String carModel = ModelTXT.getText().trim();
+        String Capacity = capacity.getSelectedItem().toString();
+        String carType = CarTypeTXT.getSelectedItem().toString();
+        String priceText = CarPriceTXT.getText().trim();
+        String status = (String) StatusCombo.getSelectedItem();
 
     // Validate inputs
-    if (carID.isEmpty() || model.isEmpty() || carType.isEmpty() || price.isEmpty() || status.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please fill out all fields.");
+    if (carId.isEmpty() ||plateNumber.isEmpty() || carModel.isEmpty() || Capacity.isEmpty() || carType.isEmpty() || priceText.isEmpty() || status.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please choose the row in the table"); //(this, "Please fill out all fields."); this is before
         return;
     }
+    
+        // Check if the plate number already exists for another car
+        String checkQuery = "SELECT COUNT(*) FROM cars WHERE plateNumber = ? AND car_id != ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(checkQuery)) {
+         pstmt.setString(1, plateNumber);
+            pstmt.setString(2, carId);
 
-    // SQL query to update car details
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                JOptionPane.showMessageDialog(this, "Plate number already exists. Please enter a unique plate number.");
+                   return;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error checking plate number: " + ex.getMessage());
+            return;
+        }
+
+    // Show confirmation dialog
+    int confirm = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to update the details for Car ID: " + carId + "?",
+        "Confirm Update",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE
+    );
+    if (confirm == JOptionPane.YES_OPTION) {
+        // SQL query to update car details
+        String query = "UPDATE cars SET plateNumber = ?, Model = ?, Type = ?,capacity = ?, Price = ?, Status = ? WHERE car_id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, plateNumber);
+            pstmt.setString(2, carModel);
+            pstmt.setString(3, carType);
+            pstmt.setString(4, Capacity);
+            pstmt.setDouble(5, Double.parseDouble(priceText)); // Ensure price is numeric
+            pstmt.setString(6, status);
+            pstmt.setString(7, carId);
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Car details updated successfully.");
+                loadCarDetails(); // Refresh table
+                
+            } else {
+                JOptionPane.showMessageDialog(this, "Update failed. Car ID not found.");
+            }
+        } catch (SQLException | NumberFormatException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error updating car details: " + ex.getMessage());
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Update operation canceled.");
+    }
+    
+    /*SQL query to update car details
     String query = "UPDATE cars SET Model = ?, Type = ?, Price = ?, Status = ? WHERE car_id = ?";
 
     try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -663,7 +842,7 @@ public class Car extends javax.swing.JFrame {
     } catch (SQLException ex) {
         ex.printStackTrace(); // Debugging purposes
         JOptionPane.showMessageDialog(this, "Error updating car details: " + ex.getMessage());
-    }
+    }*/
     }//GEN-LAST:event_UPButtonActionPerformed
 
     private void REFButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_REFButtonActionPerformed
@@ -707,6 +886,11 @@ public class Car extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_jLabel3MouseClicked
 
+    private void CLEARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CLEARActionPerformed
+        // TODO add your handling code here:
+        clearFields();
+    }//GEN-LAST:event_CLEARActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -745,9 +929,10 @@ public class Car extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ADDbutton;
+    private javax.swing.JButton CLEAR;
     private javax.swing.JTextField CarIdTXT;
     private javax.swing.JTextField CarPriceTXT;
-    private javax.swing.JTextField CarTypeTXT;
+    private javax.swing.JComboBox<String> CarTypeTXT;
     private javax.swing.JTable CarsTable;
     private javax.swing.JButton DELButton;
     private javax.swing.JTextField ModelTXT;
@@ -755,7 +940,10 @@ public class Car extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> StatusCombo;
     private javax.swing.JButton UPButton;
     private javax.swing.JButton backButton;
+    private javax.swing.JComboBox<String> capacity;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -768,5 +956,6 @@ public class Car extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField plateNumbertxt;
     // End of variables declaration//GEN-END:variables
 }

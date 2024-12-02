@@ -14,6 +14,23 @@ public class Customers extends javax.swing.JFrame {
         initComponents();
         populateCustomerTable();
         this.setLocationRelativeTo(null); // Centers the window
+        
+        //So if the user want to update or delete, user just select in the table and it will display it the details 
+        CustomersList.addMouseListener(new java.awt.event.MouseAdapter() {
+        @Override
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            int selectedRow = CustomersList.getSelectedRow(); // Get the selected row
+            if (selectedRow != -1) {
+                // Populate text fields with data from the selected row   
+                CustomerTXT.setText(CustomersList.getValueAt(selectedRow, 1).toString()); 
+                CustomersLIcenseTXT.setText(CustomersList.getValueAt(selectedRow, 2).toString());
+                CustomersAddTXT.setText(CustomersList.getValueAt(selectedRow, 3).toString()); 
+                CustomerIDTXT.setText(CustomersList.getValueAt(selectedRow, 0).toString());
+                contactNumber.setText(CustomersList.getValueAt(selectedRow, 4).toString());
+            }
+        }
+        });
+        
     }
 
     // Establishes and returns a database connection
@@ -38,7 +55,7 @@ public class Customers extends javax.swing.JFrame {
     // Populates the customer table with data from the database
    private void populateCustomerTable() {
     String query = """
-        SELECT u.id AS customer_id, u.name AS customer_name, u.license_number, u.address
+        SELECT u.id AS customer_id, u.name AS customer_name, u.license_number, u.address, u.contact_number
         FROM users u
         LEFT JOIN booking b ON u.id = b.user_id AND b.status = 'active'
     """;
@@ -48,7 +65,7 @@ public class Customers extends javax.swing.JFrame {
          ResultSet rs = pst.executeQuery()) {
 
         DefaultTableModel model = new DefaultTableModel(
-            new String[]{"Customer ID", "Name", "License Number", "Address"}, 0
+            new String[]{"Customer ID", "Name", "License Number", "Address", "Contact Number"}, 0
         );
 
         while (rs.next()) {
@@ -56,7 +73,8 @@ public class Customers extends javax.swing.JFrame {
                 rs.getInt("customer_id"),
                 rs.getString("customer_name"),
                 rs.getString("license_number"),
-                rs.getString("address")
+                rs.getString("address"),
+                rs.getString("contact_number")
             });
         }
 
@@ -148,6 +166,15 @@ public class Customers extends javax.swing.JFrame {
         return 0; // Default to 0 on error
     }
 
+    public void clearFields(){
+        CustomerIDTXT.setText(" ");
+        CustomerTXT.setText(" ");
+        CustomersLIcenseTXT.setText(" ");
+        CustomersAddTXT.setText(" ");
+        contactNumber.setText(" ");
+    }
+        
+        
 
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -166,6 +193,9 @@ public class Customers extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         CustomerIDTXT = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        contactNumber = new javax.swing.JTextField();
+        CLEAR = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         CustomersList = new javax.swing.JTable();
         SearchCustomer = new javax.swing.JButton();
@@ -236,17 +266,26 @@ public class Customers extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setText("NAME");
+        jLabel2.setText("NAME:");
 
-        jLabel4.setText("LICENSE #");
+        jLabel4.setText("LICENSE No.:");
 
-        jLabel5.setText("ADDRESS");
+        jLabel5.setText("ADDRESS:");
 
-        jLabel6.setText("CUSTOMER ID");
+        jLabel6.setText("CUSTOMER ID:");
 
         CustomerIDTXT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CustomerIDTXTActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setText("CONTACT NUMBER:");
+
+        CLEAR.setText("CLEAR");
+        CLEAR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CLEARActionPerformed(evt);
             }
         });
 
@@ -257,159 +296,181 @@ public class Customers extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel4))
-                .addGap(41, 41, 41)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(CustomersLIcenseTXT, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
-                        .addComponent(CustomerTXT)
-                        .addComponent(CustomersAddTXT))
-                    .addComponent(CustomerIDTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel9)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(CLEAR)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel6)
+                                .addComponent(jLabel5)
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel4))
+                            .addGap(41, 41, 41)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(CustomerIDTXT, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                                .addComponent(contactNumber, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(CustomerTXT, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(CustomersAddTXT, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(CustomersLIcenseTXT)))))
                 .addContainerGap(35, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(CustomerIDTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel6)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
-                    .addComponent(CustomerTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CustomerTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(CustomersLIcenseTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15, 15, 15)
+                .addGap(9, 9, 9)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(CustomersAddTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(CustomerIDTXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                    .addComponent(jLabel9)
+                    .addComponent(contactNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(CLEAR)
+                .addContainerGap(10, Short.MAX_VALUE))
         );
 
         CustomersList.setBackground(new java.awt.Color(255, 255, 204));
         CustomersList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "NAME", "LICENSE NO.", "ADDRESS", "CUSTOMER ID"
+                "NAME", "LICENSE NO.", "ADDRESS", "CUSTOMER ID", "CONTACT NUMBER"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Short.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.Short.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
         CustomersList.setColumnSelectionAllowed(true);
         jScrollPane1.setViewportView(CustomersList);
+        CustomersList.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
         SearchCustomer.setText("SEARCH");
         SearchCustomer.addActionListener(new java.awt.event.ActionListener() {
@@ -510,17 +571,19 @@ public class Customers extends javax.swing.JFrame {
                 .addComponent(jLabel8)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(SearchCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(DeleteCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(33, 33, 33)
+                            .addComponent(DeleteCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(SearchCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(UpdateCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(RefrshCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE)
+                            .addComponent(RefrshCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(31, 31, 31)))
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0))
         );
@@ -655,6 +718,7 @@ public class Customers extends javax.swing.JFrame {
     String customerName = CustomerTXT.getText().trim();
     String licenseNumber = CustomersLIcenseTXT.getText().trim();
     String address = CustomersAddTXT.getText().trim();
+    String contact_number = contactNumber.getText().trim();
     
     // Validate inputs
     if (customerId.isEmpty() || customerName.isEmpty() || licenseNumber.isEmpty() || address.isEmpty()) {
@@ -687,6 +751,7 @@ public class Customers extends javax.swing.JFrame {
             pst.setString(2, licenseNumber);   // Second placeholder (license_number)
             pst.setString(3, address);         // Third placeholder (address)
             pst.setString(4, customerId);      // Fourth placeholder (id)
+            //pst.setString(5, contact_number);
 
             // Execute the update query
             int rowsAffected = pst.executeUpdate();
@@ -741,6 +806,11 @@ public class Customers extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_jLabel3MouseClicked
 
+    private void CLEARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CLEARActionPerformed
+        // TODO add your handling code here:
+        clearFields();
+    }//GEN-LAST:event_CLEARActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -778,6 +848,7 @@ public class Customers extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton CLEAR;
     private javax.swing.JTextField CustomerIDTXT;
     private javax.swing.JTextField CustomerTXT;
     private javax.swing.JTextField CustomersAddTXT;
@@ -788,6 +859,7 @@ public class Customers extends javax.swing.JFrame {
     private javax.swing.JButton SearchCustomer;
     private javax.swing.JButton UpdateCustomer;
     private javax.swing.JButton backButton;
+    private javax.swing.JTextField contactNumber;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -796,6 +868,7 @@ public class Customers extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
