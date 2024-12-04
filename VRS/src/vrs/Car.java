@@ -348,7 +348,7 @@ public class Car extends javax.swing.JFrame {
 
         jLabel6.setText("Status:");
 
-        StatusCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "AVAILABLE", "NOT AVAILABLE", "UNDER MAINTENANCE" }));
+        StatusCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Available", "Under Maintenance" }));
         StatusCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 StatusComboActionPerformed(evt);

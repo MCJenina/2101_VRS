@@ -207,85 +207,88 @@ public class LogIn extends javax.swing.JFrame {
     }//GEN-LAST:event_SignUpActionPerformed
 
     private void LogInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogInActionPerformed
+String userName = UserName.getText();
+char[] password = Password.getPassword();
 
-        String userName = UserName.getText();
-        char[] password = Password.getPassword();
+PreparedStatement pst = null;
+ResultSet rs = null;
 
-        PreparedStatement pst = null;
-        ResultSet rs = null;
+try {
+    // Check the Login table for admin accounts
+    String sqlQuery = "SELECT * FROM Login WHERE username=?";
+    pst = connection.prepareStatement(sqlQuery);
+    pst.setString(1, userName);  // Case-sensitive query
+    rs = pst.executeQuery();
 
-        try {
-            // Check the Login table for admin accounts
-            String sqlQuery = "SELECT * FROM Login WHERE username=?";
-            pst = connection.prepareStatement(sqlQuery);
-            pst.setString(1, userName);
-            rs = pst.executeQuery();
+    if (rs.next()) {
+        String storedPassword = rs.getString("password");
+        String role = rs.getString("role");
 
-            if (rs.next()) {
-                String storedPassword = rs.getString("password");
-                String role = rs.getString("role");
+        // Compare password exactly as it is stored in the database
+        if (String.valueOf(password).equals(storedPassword)) {
+            JOptionPane.showMessageDialog(null, "Log In Success!");
 
-                if (String.valueOf(password).equals(storedPassword)) {
-                    JOptionPane.showMessageDialog(null, "Log In Success!");
+            // Admin role check
+            if ("admin".equals(role)) {
+                Admin_DashBoard adminDashboard = new Admin_DashBoard();
+                adminDashboard.setVisible(true);
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Unknown role: " + role);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Incorrect Password!");
+        }
+    } else {
+        // No admin found, check the users table for customer accounts
+        sqlQuery = "SELECT * FROM users WHERE username=?";
+        pst = connection.prepareStatement(sqlQuery);
+        pst.setString(1, userName);  // Case-sensitive query
+        rs = pst.executeQuery();
 
-                    // Admin role check
-                    if ("admin".equals(role)) {
-                        Admin_DashBoard adminDashboard = new Admin_DashBoard();
-                        adminDashboard.setVisible(true);
-                        this.dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Unknown role: " + role);
-                    }
+        if (rs.next()) {
+            String storedPassword = rs.getString("password");
+            String role = rs.getString("role");
+            int customerId = rs.getInt("id");  // Assuming `customerId` exists in the users table
+
+            // Compare password exactly as it is stored in the database
+            if (String.valueOf(password).equals(storedPassword)) {
+                JOptionPane.showMessageDialog(null, "Log In Success!");
+
+                // Customer role check
+                if ("customer".equals(role)) {
+                    // Set the session for the logged-in customer
+                    SessionManager.setCustomerId(customerId);
+
+                    CustomerDashboard cd = new CustomerDashboard();
+                    cd.setVisible(true);
+
+                    this.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(null, "Incorrect Password!");
+                    JOptionPane.showMessageDialog(null, "Unknown role: " + role);
                 }
             } else {
-                // No admin found, check the users table for customer accounts
-                sqlQuery = "SELECT * FROM users WHERE username=?";
-                pst = connection.prepareStatement(sqlQuery);
-                pst.setString(1, userName);
-                rs = pst.executeQuery();
-
-                if (rs.next()) {
-                    String storedPassword = rs.getString("password");
-                    String role = rs.getString("role");
-                    int customerId = rs.getInt("id");  // Assuming `customerId` exists in the users table
-
-                    if (String.valueOf(password).equals(storedPassword)) {
-                        JOptionPane.showMessageDialog(null, "Log In Success!");
-
-                        // Customer role check
-                        if ("customer".equals(role)) {
-                            // Set the session for the logged-in customer
-                            SessionManager.setCustomerId(customerId);
-
-                            CustomerDashboard cd = new CustomerDashboard();
-                            cd.setVisible(true);
-
-                            this.dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Unknown role: " + role);
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Incorrect Password!");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Username not found!");
-                }
+                JOptionPane.showMessageDialog(null, "Incorrect Password!");
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
-            e.printStackTrace();  // For debugging
-        } finally {
-            // Close resources properly
-            try {
-                if (rs != null) rs.close();
-                if (pst != null) pst.close();
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error closing resources: " + e.getMessage());
-                e.printStackTrace();
-            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Username not found!");
         }
+    }
+} catch (SQLException e) {
+    JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+    e.printStackTrace();  // For debugging
+} finally {
+    // Close resources properly
+    try {
+        if (rs != null) rs.close();
+        if (pst != null) pst.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error closing resources: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+
     }//GEN-LAST:event_LogInActionPerformed
 
     private void ShowPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShowPassActionPerformed

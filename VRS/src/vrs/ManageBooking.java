@@ -57,12 +57,15 @@ public class ManageBooking extends javax.swing.JFrame {
     // Method to load the booking data into the JTable
     public static void loadBookingData(DefaultTableModel model, String userNameFilter) {
         // Base query to get all returned bookings
-        String query = "SELECT r.return_date, b.user_id, u.name AS user_name, b.vehicle_price, r.late_fee, r.damage_fee, " +
-                       "(b.vehicle_price + IFNULL(r.late_fee, 0) + IFNULL(r.damage_fee, 0)) AS total " +
-                       "FROM booking b " +
-                       "JOIN returns r ON b.booking_id = r.booking_id " +
-                       "JOIN users u ON b.user_id = u.id " +
-                       "WHERE b.status = 'returned'";  // Query to get all returned bookings
+        String query = "SELECT r.return_date, b.user_id, u.name AS user_name, c.price, " +
+               "IFNULL(r.late_fee, 0) AS late_fee, IFNULL(r.damage_fee, 0) AS damage_fee, " +
+               "(c.price + IFNULL(r.late_fee, 0) + IFNULL(r.damage_fee, 0)) AS total " +
+               "FROM booking b " +
+               "JOIN returns r ON b.booking_id = r.booking_id " +
+               "JOIN users u ON b.user_id = u.id " +
+               "JOIN cars c ON b.car_id = c.car_id " +  // Assuming 'cars' table for price info
+               "WHERE b.status = 'returned'";
+
 
         // Modify query to include username filter if provided
         if (userNameFilter != null && !userNameFilter.isEmpty()) {
@@ -82,13 +85,13 @@ public class ManageBooking extends javax.swing.JFrame {
                 String returnDate = rs.getString("return_date");
                 int userId = rs.getInt("user_id");
                 String userName = rs.getString("user_name");
-                double vehiclePrice = rs.getDouble("vehicle_price");
+                double Price = rs.getDouble("Price");
                 double lateFee = rs.getDouble("late_fee");
                 double damageFee = rs.getDouble("damage_fee");
                 double total = rs.getDouble("total");
 
                 // Add row to table model
-                model.addRow(new Object[]{returnDate, userId, userName, vehiclePrice, lateFee, damageFee, total});
+                model.addRow(new Object[]{returnDate, userId, userName, Price, lateFee, damageFee, total});
                 dataFound = true;
             }
 
@@ -138,7 +141,7 @@ public class ManageBooking extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Return Date", "Name", "Car Price", "Place Fee", "Late Fee", "Damage Fee", "Total"
+                "Return Date", "Name", "Price", "Place Fee", "Late Fee", "Damage Fee", "Total"
             }
         ));
         jScrollPane2.setViewportView(manage_booking_table);
@@ -170,43 +173,42 @@ public class ManageBooking extends javax.swing.JFrame {
         BookpanelLayout.setHorizontalGroup(
             BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(BookpanelLayout.createSequentialGroup()
-                .addGap(17, 17, 17)
                 .addGroup(BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(BookpanelLayout.createSequentialGroup()
-                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
-                        .addGap(347, 347, 347)
+                        .addGap(17, 17, 17)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(BookpanelLayout.createSequentialGroup()
-                        .addGroup(BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 537, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(BookpanelLayout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(Name, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(29, 29, 29)
-                                .addComponent(Search, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(68, 68, 68)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Name, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(41, 41, 41)
+                        .addComponent(Search, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BookpanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addGap(43, 43, 43))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
         );
         BookpanelLayout.setVerticalGroup(
             BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(BookpanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGap(5, 5, 5)
+                .addGroup(BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(27, 27, 27)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addGroup(BookpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(Name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(Search, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(34, 34, 34)
                 .addComponent(jButton1)
                 .addGap(13, 13, 13))
         );
@@ -219,7 +221,7 @@ public class ManageBooking extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(Bookpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(Bookpanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();

@@ -32,6 +32,7 @@
                 <configuration>
                     <compilerArgs>
                         <arg>--enable-preview</arg>
+                        <arg>--enable-preview</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

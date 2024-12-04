@@ -18,16 +18,34 @@ import vrs.SessionManager;
     private final int loggedInUserId;
 
     public Returncar() {
-       this.loggedInUserId = SessionManager.getCustomerId(); // Get user ID from Session Manager
+        this.loggedInUserId = SessionManager.getCustomerId(); // Get user ID from Session Manager
         System.out.println("Logged In User ID: " + loggedInUserId); // Debugging line to check user ID
         initComponents();
         this.setLocationRelativeTo(null);
         this.setTitle("Return Car");
         connectDatabase();
         loadActiveBookings();
-        
-      
-        
+
+        // Adding ListSelectionListener to the table
+        ReturnCarsTable.getSelectionModel().addListSelectionListener(e -> {
+            // Check if a row is selected
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = ReturnCarsTable.getSelectedRow();
+
+                if (selectedRow >= 0) {
+                    // Get the booking details from the selected row
+                    int bookingId = (int) ReturnCarsTable.getValueAt(selectedRow, 0);
+                    Date bookingReturnDate = (Date) ReturnCarsTable.getValueAt(selectedRow, 2); // Get the booking's expected return date
+
+                    // Update the text field with the return date from the table
+                    if (bookingReturnDate != null) {
+                        bookingDateTextField.setText(bookingReturnDate.toString());  // Display the date in the TextField
+                    } else {
+                        bookingDateTextField.setText("");  // Clear text field if no date
+                    }
+                }
+            }
+        });
     }
 
     // Method to connect to the database
@@ -48,7 +66,7 @@ import vrs.SessionManager;
     private void loadActiveBookings() {
     // Modified query to join ReturnCarsTable with CarsTable to fetch model based on car_id
     // Since return_date was removed from booking, this query will no longer attempt to fetch it
-    String query = "SELECT r.booking_id, c.model, r.booking_date " +
+    String query = "SELECT r.booking_id, c.model, r.return_date " +
                    "FROM booking r " +
                    "JOIN cars c ON r.car_id = c.car_id " +
                    "WHERE r.user_id = ? AND r.status = 'active'";
@@ -71,7 +89,7 @@ import vrs.SessionManager;
         while (rs.next()) { 
             int bookingId = rs.getInt("booking_id");
             String carModel = rs.getString("model"); // Retrieve the model name
-            Date startDate = rs.getDate("booking_date");
+            Date startDate = rs.getDate("return_date");
 
             // Add data to the table row
             model.addRow(new Object[]{bookingId, carModel, startDate});
@@ -88,32 +106,30 @@ import vrs.SessionManager;
         JOptionPane.showMessageDialog(this, "Failed to load active bookings: " + e.getMessage());
     }
 }
-    private boolean returnVehicle(int car_id, int bookingId, LocalDate userReturnDate, long lateFee, long damageFee) {
-    String getBookingDetailsQuery = "SELECT booking_date, car_id, user_id FROM booking WHERE booking_id = ? AND status = 'active'";
-
-    String updateBookingStatusQuery = "UPDATE booking SET status = 'returned', booking_date = ?WHERE booking_id = ?";
-
+    private boolean returnVehicle(int carId, int bookingId, LocalDate userReturnDate, long lateFee, long damageFee) {
+    String getBookingDetailsQuery = "SELECT return_date, car_id, user_id FROM booking WHERE booking_id = ? AND status = 'active'";
+    String updateBookingStatusQuery = "UPDATE booking SET status = 'returned', return_date = ? WHERE booking_id = ?";
     String updateCarStatusQuery = "UPDATE cars SET status = 'Available' WHERE car_id = ?";
+    String getCarPriceQuery = "SELECT price FROM cars WHERE car_id = ?"; 
 
     try {
+        // Begin transaction
+        connection.setAutoCommit(false);
+
         // Retrieve booking details from the database
         LocalDate bookingDate = null;
         LocalDate bookingReturnDate = null;
-        int carId = -1;
-        int userId = -1; // Initialize userId
+        int userId = -1;
 
         try (PreparedStatement ps = connection.prepareStatement(getBookingDetailsQuery)) {
             ps.setInt(1, bookingId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                bookingDate = rs.getDate("booking_date") != null ? rs.getDate("booking_date").toLocalDate() : null;
-                java.sql.Date returnDate = rs.getDate("booking_date");
-                if (returnDate != null) {
-                    bookingReturnDate = returnDate.toLocalDate();
-                }
+                bookingDate = rs.getDate("return_date") != null ? rs.getDate("return_date").toLocalDate() : null;
+                bookingReturnDate = rs.getDate("return_date") != null ? rs.getDate("return_date").toLocalDate() : null;
                 carId = rs.getInt("car_id");
-                userId = rs.getInt("user_id");  // Retrieve user_id from booking table
+                userId = rs.getInt("user_id");
             } else {
                 JOptionPane.showMessageDialog(this, "Booking not found or already returned.");
                 return false;
@@ -125,17 +141,31 @@ import vrs.SessionManager;
             return false;
         }
 
+        // Calculate late fee
         long daysLate = ChronoUnit.DAYS.between(bookingReturnDate, userReturnDate);
         if (daysLate > 0) {
-            lateFee = daysLate * 1000;
+            // Get car price from the database
+            long carPrice = 0;
+            try (PreparedStatement ps = connection.prepareStatement(getCarPriceQuery)) {
+                ps.setInt(1, carId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    carPrice = rs.getLong("price");  
+                }
+            }
+
+            // If the vehicle is returned late, apply late fee
+            lateFee = carPrice * 2;  
             JOptionPane.showMessageDialog(this, "You are " + daysLate + " days late. Late fee: PHP " + lateFee);
         } else {
             JOptionPane.showMessageDialog(this, "Returned on time. No late fee.");
         }
 
         // Insert return data into the 'returns' table
-        if (!insertReturnData( bookingId, java.sql.Date.valueOf(userReturnDate), userId,car_id, lateFee, damageFee)) {
+        if (!insertReturnData(bookingId, java.sql.Date.valueOf(userReturnDate), userId, carId, lateFee, damageFee)) {
             JOptionPane.showMessageDialog(this, "Failed to insert return data.");
+            connection.rollback(); // Rollback on failure
+            return false;
         }
 
         // Update booking status to 'returned' and set the return date
@@ -151,32 +181,42 @@ import vrs.SessionManager;
             ps.executeUpdate();
         }
 
+        // Commit transaction
+        connection.commit();
         JOptionPane.showMessageDialog(this, "Vehicle returned successfully!");
         return true;
 
     } catch (SQLException e) {
+        try {
+            connection.rollback(); // Rollback on error
+        } catch (SQLException rollbackException) {
+            rollbackException.printStackTrace();
+        }
         JOptionPane.showMessageDialog(this, "Error processing return: " + e.getMessage());
         e.printStackTrace();
+    } finally {
+        try {
+            connection.setAutoCommit(true); // Reset auto-commit to true
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
-
     return false;
 }
 
-private boolean insertReturnData( int bookingId,  java.sql.Date userReturnDate,int car_id,int userId, long lateFee, long damageFee) {
-    String insertQuery = "INSERT INTO returns (  booking_id, return_date,car_id ,user_id, late_fee, damage_fee) VALUES (?, ?, ?, ?, ?, ?)";
+private boolean insertReturnData(int bookingId, java.sql.Date userReturnDate, int car_id, int userId, long lateFee, long damageFee) {
+    String insertQuery = "INSERT INTO returns (booking_id, return_date, car_id, user_id, late_fee, damage_fee) VALUES (?, ?, ?, ?, ?, ?)";
 
     try (PreparedStatement ps = connection.prepareStatement(insertQuery)) {
-        // Set each parameter in the prepared statement
-        ps.setInt(3, car_id);  // car_id
-        ps.setInt(4, userId);  // user_id (added to the query)
-        ps.setInt(1, bookingId);  // booking_id
-        ps.setDate(2, userReturnDate);  // return_date
-        ps.setLong(5, lateFee);  // late_fee
-        ps.setLong(6, damageFee);  // damage_fee
+        ps.setInt(1, bookingId);
+        ps.setDate(2, userReturnDate); 
+        ps.setInt(3, car_id);  
+        ps.setInt(4, userId);  
+        ps.setLong(5, lateFee);  
+        ps.setLong(6, damageFee); 
 
-        // Execute the insert query
         int rowsAffected = ps.executeUpdate();
-        return rowsAffected > 0;  // Return true if insertion was successful
+        return rowsAffected > 0;  
     } catch (SQLException e) {
         e.printStackTrace();
         JOptionPane.showMessageDialog(this, "Failed to insert return data: " + e.getMessage());
@@ -184,20 +224,33 @@ private boolean insertReturnData( int bookingId,  java.sql.Date userReturnDate,i
     }
 }
 
-
-private long calculateLateFee(LocalDate bookingReturnDate, LocalDate userReturnDate) {
-
-// Convert java.util.Date to LocalDate
-            // Calculate the number of days late (if the returnDate is after the bookingReturnDate)
-     long daysLate = ChronoUnit.DAYS.between(bookingReturnDate, userReturnDate);
-
-     if (daysLate > 0) {
-        return daysLate * 1000; // 1000 is the late fee per day, adjust this if needed
-    }
+private void returnVehicleAndCheckDamage(int carId, int bookingId) throws SQLException {
+    // Mark vehicle as under maintenance if damaged
+    String updateQuery = "UPDATE cars SET status = 'Under Maintenance' WHERE car_id = ?";
     
-    // Return 0 if the vehicle is returned on time or early
-    return 0;
-}private boolean updateBookingStatus(int bookingId) {
+    try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+        stmt.setInt(1, carId);  
+        stmt.executeUpdate();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error marking vehicle as under maintenance.");
+        return;
+    }
+
+    // Log damage
+    String damageLogQuery = "INSERT INTO damage_logs (car_id, booking_id, damage_reported) VALUES (?, ?, ?)";
+    
+    try (PreparedStatement logStmt = connection.prepareStatement(damageLogQuery)) {
+        logStmt.setInt(1, carId);  
+        logStmt.setInt(2, bookingId);  
+        logStmt.setBoolean(3, true);  
+        logStmt.executeUpdate();  
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error logging damage details.");
+    }
+}
+private boolean updateBookingStatus(int bookingId) {
     try {
         // Database connection
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/vehiclerentalsystem?useSSL=false&serverTimezone=UTC", "Jenina","qwertyuiop");
@@ -233,55 +286,90 @@ private int getCarIdFromBooking(int bookingId) {
     }
     return carId;
 }
-// Method to mark vehicle as under maintenance
-private void markVehicleAsUnderMaintenance(int carId) throws SQLException {
-    // Ensure the connection is valid
+
+// Method to calculate late fee
+private long calculateLateFee(LocalDate bookingDate, LocalDate userReturnDate) {
+    // Your late fee calculation logic here
+    // Example: if user returns later than the booking date, charge a fee
+    long daysLate = ChronoUnit.DAYS.between(bookingDate, userReturnDate);
+    if (daysLate > 0) {
+        return daysLate * 100;  // Assuming 100 is the daily late fee
+    }
+    return 0;
+}
+
+
+
+
+// Method to mark the vehicle as under maintenance
+private void markVehicleAsUnderMaintenance(int carId, int bookingId) throws SQLException {
     if (connection == null || connection.isClosed()) {
         connection = connectDatabase(); // Reconnect if necessary
     }
 
-    // Update query to mark the vehicle as under maintenance
-    String updateQuery = "UPDATE cars SET status = 'Under Maintenance' WHERE car_id = ?";
+    String updateCarQuery = "UPDATE cars SET status = 'Under Maintenance' WHERE car_id = ?";
+    String updateBookingQuery = "UPDATE booking SET status = 'Under Maintenance' WHERE car_id = ? AND booking_id = ?";
 
-    try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-        preparedStatement.setInt(1, carId); // Set the carId (vehicle ID) in the query
-        
-        // Execute the update query
-        int rowsAffected = preparedStatement.executeUpdate();
-        
-        if (rowsAffected > 0) {
-            JOptionPane.showMessageDialog(this, "Vehicle marked as under maintenance successfully!");
-        } else {
-            JOptionPane.showMessageDialog(this, "No such vehicle found.");
+    try {
+        // Start a transaction
+        connection.setAutoCommit(false);
+
+        // Update the car status
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateCarQuery)) {
+            preparedStatement.setInt(1, carId);
+            int carRowsAffected = preparedStatement.executeUpdate();
+            if (carRowsAffected == 0) {
+                JOptionPane.showMessageDialog(this, "No such vehicle found to mark as under maintenance.");
+                connection.rollback(); // Rollback if no car is found
+                return;
+            }
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error updating vehicle status: " + e.getMessage());
+
+        // Update the booking status
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateBookingQuery)) {
+            preparedStatement.setInt(1, carId);
+            preparedStatement.setInt(2, bookingId);
+            int bookingRowsAffected = preparedStatement.executeUpdate();
+            if (bookingRowsAffected == 0) {
+                JOptionPane.showMessageDialog(this, "Booking not found to mark as under maintenance.");
+                connection.rollback(); // Rollback if no booking is found
+                return;
+            }
+        }
+
+        // Commit the transaction if everything was successful
+        connection.commit();
+        JOptionPane.showMessageDialog(this, "Vehicle marked as under maintenance.");
+    } catch (SQLException ex) {
+        // Handle SQL exception and rollback transaction if necessary
+        if (connection != null) {
+            connection.rollback();
+        }
+        Logger.getLogger(Returncar.class.getName()).log(Level.SEVERE, null, ex);
+        JOptionPane.showMessageDialog(this, "An error occurred while updating the maintenance status.");
+    } finally {
+        // Reset auto-commit to true after transaction
+        if (connection != null) {
+            connection.setAutoCommit(true);
+        }
     }
 }
 
-// Method to return vehicle and check for damage
-private void returnVehicleAndCheckDamage() throws SQLException {
-    int selectedRow = ReturnCarsTable.getSelectedRow();
-
-    if (selectedRow >= 0) {
-        // Get the booking details
-        int bookingId = (int) ReturnCarsTable.getValueAt(selectedRow, 0);
-        int carId = (int) ReturnCarsTable.getValueAt(selectedRow, 1); // Get the carId from the table
-
-        // Check if the damage checkbox is selected
-        boolean isDamageSelected = damageCheckbox.isSelected();
-
-        // If damage is selected, mark the vehicle as under maintenance
-        if (isDamageSelected) {
-            markVehicleAsUnderMaintenance(carId);
+// Method to fetch the vehicle's price from the database
+private long getVehiclePrice(int carId) {
+    long vehiclePrice = 0;
+    String query = "SELECT Price FROM cars WHERE car_id = ?";  // Query to get the price from 'cars' table
+    try (PreparedStatement ps = connection.prepareStatement(query)) {
+        ps.setInt(1, carId);  // Set the car_id parameter to fetch the price
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            vehiclePrice = rs.getLong("Price");  // Fetch the vehicle price from the 'Price' column
         }
-
-        // Additional logic for returning the vehicle
-        // Process the return, calculate late fees, etc.
-    } else {
-        JOptionPane.showMessageDialog(this, "Please select a booking to return.");
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error retrieving vehicle price: " + ex.getMessage());
     }
+    return vehiclePrice;
 }
 
 
@@ -330,7 +418,7 @@ private void returnVehicleAndCheckDamage() throws SQLException {
 
             },
             new String [] {
-                "Booking ID", "Model", "Booking Date"
+                "Booking ID", "Model", "Return Date"
             }
         ) {
             Class[] types = new Class [] {
@@ -443,38 +531,38 @@ private void returnVehicleAndCheckDamage() throws SQLException {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ReturnjButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReturnjButton1ActionPerformed
-// Get the selected booking from the table
-int selectedRow = ReturnCarsTable.getSelectedRow();
+ 
+    // Get the selected booking from the table
+    int selectedRow = ReturnCarsTable.getSelectedRow();
 
-// Check if a booking is selected
-if (selectedRow >= 0) {
-    // Get the booking details
-    int bookingId = (int) ReturnCarsTable.getValueAt(selectedRow, 0);
-    Date bookingReturnDate = (Date) ReturnCarsTable.getValueAt(selectedRow, 2); // Get the booking's expected return date
-    
-    // Check if bookingReturnDate is null and handle appropriately
-    if (bookingReturnDate != null) {
-        // Set the booking return date in the text field (assuming it's a JTextField)
-        bookingDateTextField.setText(bookingReturnDate.toString());  // Display the date in the TextField
-    } else {
-        JOptionPane.showMessageDialog(this, "No return date available for this booking.");
-        return;  // Exit if no return date is available
-    }
+    // Check if a booking is selected
+    if (selectedRow >= 0) {
+        // Get the booking details
+        int bookingId = (int) ReturnCarsTable.getValueAt(selectedRow, 0);
+        Date bookingReturnDate = (Date) ReturnCarsTable.getValueAt(selectedRow, 2); // Get the booking's expected return date
 
-    // Get the return date selected by the user (from JDateChooser or similar component)
-    java.util.Date userReturnDate = returnDateChooser.getDate();  // Get the selected date from JDateChooser
+        // Check if bookingReturnDate is null and handle appropriately
+        if (bookingReturnDate != null) {
+            // Set the booking return date in the text field (assuming it's a JTextField)
+            bookingDateTextField.setText(bookingReturnDate.toString());  // Display the date in the TextField
+        } else {
+            JOptionPane.showMessageDialog(this, "No return date available for this booking.");
+            return;  // Exit if no return date is available
+        }
 
-    // Check if the user has selected a return date
-    if (userReturnDate == null) {
-        JOptionPane.showMessageDialog(this, "Please select a return date.");
-        return;  // Exit if no date is selected
-    }
+        // Get the return date selected by the user (from JDateChooser or similar component)
+        java.util.Date userReturnDate = returnDateChooser.getDate();  // Get the selected date from JDateChooser
 
-    // Convert java.util.Date to LocalDate
-    LocalDate localUserReturnDate = userReturnDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        // Check if the user has selected a return date
+        if (userReturnDate == null) {
+            JOptionPane.showMessageDialog(this, "Please select a return date.");
+            return;  // Exit if no date is selected
+        }
 
-    // Convert the booking's return date (java.sql.Date) to LocalDate, with a null check
-    if (bookingReturnDate != null) {
+        // Convert java.util.Date to LocalDate
+        LocalDate localUserReturnDate = userReturnDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        // Convert the booking's return date (java.sql.Date) to LocalDate
         LocalDate localBookingReturnDate = bookingReturnDate.toLocalDate();
 
         // Calculate late fee if necessary
@@ -483,41 +571,53 @@ if (selectedRow >= 0) {
         // Retrieve car_id from the database using bookingId
         int carId = getCarIdFromBooking(bookingId);
 
+        // Get the vehicle price for the carId (you can display or calculate based on this)
+        long vehiclePrice = getVehiclePrice(carId);
+
         // Check if the damage checkbox is selected and calculate damage fee only if it is
         long damageFee = 0;
         if (damageCheckbox.isSelected()) {
-            damageFee = 500; // Assuming damage fee is a fixed amount
+            damageFee = 3000; // Assuming damage fee is a fixed amount
             try {
-                // Mark the vehicle as "under maintenance" in the database to prevent new bookings
-                markVehicleAsUnderMaintenance(carId);
+                // Call markVehicleAsUnderMaintenance to handle the vehicle damage and maintenance marking
+                markVehicleAsUnderMaintenance(carId, bookingId); // Mark vehicle as under maintenance
+                // Optionally log damage details
+                returnVehicleAndCheckDamage(carId, bookingId);
+                JOptionPane.showMessageDialog(this, "Vehicle is under maintenance due to damage. It cannot be booked by other customers until repaired.");
             } catch (SQLException ex) {
                 Logger.getLogger(Returncar.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this, "An error occurred while marking the vehicle as under maintenance.");
             }
-
-            JOptionPane.showMessageDialog(this, "Vehicle is under maintenance due to damage. It cannot be booked by other customers until repaired.");
         }
 
-        // Now, insert the return data into the returns table
-        boolean isReturnSuccessful = returnVehicle(carId, bookingId, localUserReturnDate, lateFee, damageFee);
+        // Display a notice with the fees before returning the vehicle
+        String feesMessage = "Late Fee: Php " + lateFee + "\n" +
+                             "Damage Fee: Php " + damageFee + "\n" +
+                             "Total: Php " + (lateFee + damageFee);
+        int confirmReturn = JOptionPane.showConfirmDialog(this, feesMessage + "\n\nDo you want to proceed with the return?", "Confirm Return", JOptionPane.YES_NO_OPTION);
 
-        if (isReturnSuccessful) {
-            // After returning, update the booking status to "returned"
-            updateBookingStatus(bookingId);
+        if (confirmReturn == JOptionPane.YES_OPTION) {
+            // Now, insert the return data into the returns table
+            boolean isReturnSuccessful = returnVehicle(carId, bookingId, localUserReturnDate, lateFee, damageFee);
 
-            // After returning, remove the row from the table
-            DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
-            model.removeRow(selectedRow);
+            if (isReturnSuccessful) {
+                // After returning, update the booking status to "returned"
+                updateBookingStatus(bookingId);
 
-            JOptionPane.showMessageDialog(this, "Vehicle returned successfully!");
+                // After returning, remove the row from the table
+                DefaultTableModel model = (DefaultTableModel) ReturnCarsTable.getModel();
+                model.removeRow(selectedRow);
+
+                JOptionPane.showMessageDialog(this, "Vehicle returned successfully!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Return failed. Please check your return details.");
+            }
         } else {
-            JOptionPane.showMessageDialog(this, "Return failed. Please check your return details.");
+            JOptionPane.showMessageDialog(this, "Return cancelled.");
         }
     } else {
-        JOptionPane.showMessageDialog(this, "Booking return date is missing.");
+        JOptionPane.showMessageDialog(this, "Please select a booking to return.");
     }
-} else {
-    JOptionPane.showMessageDialog(this, "Please select a booking to return.");
-}
 
         }//GEN-LAST:event_ReturnjButton1ActionPerformed
 
